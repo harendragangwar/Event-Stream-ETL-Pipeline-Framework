@@ -1,6 +1,7 @@
 import os
 import sys
 import logging
+import random
 from datetime import datetime
 
 class DataPipelineCore:
@@ -34,9 +35,25 @@ class DataPipelineCore:
         }
         self.logger.info("Basic pipeline configuration dictionary loaded")
 
+    def extract_raw_logs(self):
+        self.logger.info("Starting mock data extraction from source endpoint")
+        events = ["click", "view", "purchase", "cart_add"]
+        mock_data = []
+        for i in range(10):
+            record = {
+                "event_id": f"evt_{random.randint(1000, 9999)}",
+                "timestamp": datetime.now().isoformat(),
+                "action": random.choice(events),
+                "user_id": f"usr_{random.randint(1, 100)}"
+            }
+            mock_data.append(record)
+        self.logger.info(f"Successfully extracted {len(mock_data)} raw event logs")
+        return mock_data
+
     def run_pipeline(self):
         self.logger.info("Executing active data node checkpoints")
         self.status = "RUNNING"
+        data = self.extract_raw_logs()
         return True
 
 if __name__ == "__main__":
