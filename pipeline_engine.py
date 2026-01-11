@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 import logging
 import random
 from datetime import datetime
@@ -20,19 +21,12 @@ class DataPipelineCore:
         logging.basicConfig(
             level=logging.INFO,
             format=log_format,
-            handlers=[
-                logging.FileHandler(f"{log_dir}/pipeline_execution.log"),
-                logging.StreamHandler(sys.stdout)
-            ]
+            handlers=[logging.FileHandler(f"{log_dir}/pipeline_execution.log"), logging.StreamHandler(sys.stdout)]
         )
         self.logger = logging.getLogger("EnterprisePipeline")
 
     def _load_config(self):
-        self.config = {
-            "batch_size": 500,
-            "retry_limit": 3,
-            "timeout": 30
-        }
+        self.config = {"batch_size": 500, "retry_limit": 3, "timeout": 30}
         self.logger.info("Basic pipeline configuration dictionary loaded")
 
     def extract_raw_logs(self):
@@ -50,10 +44,20 @@ class DataPipelineCore:
         self.logger.info(f"Successfully extracted {len(mock_data)} raw event logs")
         return mock_data
 
+    def save_raw_data(self, data):
+        raw_dir = "data/raw"
+        if not os.path.exists(raw_dir):
+            os.makedirs(raw_dir)
+        file_path = f"{raw_dir}/raw_events_{self.execution_id}.json"
+        with open(file_path, "w") as f:
+            json.dump(data, f, indent=2)
+        self.logger.info(f"Saved raw extraction batch to local path: {file_path}")
+
     def run_pipeline(self):
         self.logger.info("Executing active data node checkpoints")
         self.status = "RUNNING"
         data = self.extract_raw_logs()
+        self.save_raw_data(data)
         return True
 
 if __name__ == "__main__":
