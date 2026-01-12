@@ -37,7 +37,7 @@ class DataPipelineCore:
             record = {
                 "event_id": f"evt_{random.randint(1000, 9999)}",
                 "timestamp": datetime.now().isoformat(),
-                "action": random.choice(events),
+                "action": random.choice(events) if random.random() > 0.1 else None,
                 "user_id": f"usr_{random.randint(1, 100)}"
             }
             mock_data.append(record)
@@ -53,11 +53,22 @@ class DataPipelineCore:
             json.dump(data, f, indent=2)
         self.logger.info(f"Saved raw extraction batch to local path: {file_path}")
 
+    def validate_records(self, data):
+        clean_data = []
+        for record in data:
+            if not record.get("action") or not record.get("event_id"):
+                self.logger.warning(f"Skipping bad record missing critical fields: {record['event_id']}")
+                continue
+            clean_data.append(record)
+        self.logger.info(f"Validation complete. Passed: {len(clean_data)}/{len(data)}")
+        return clean_data
+
     def run_pipeline(self):
         self.logger.info("Executing active data node checkpoints")
         self.status = "RUNNING"
         data = self.extract_raw_logs()
         self.save_raw_data(data)
+        validated_data = self.validate_records(data)
         return True
 
 if __name__ == "__main__":
