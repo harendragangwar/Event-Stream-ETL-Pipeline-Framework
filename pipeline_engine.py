@@ -17,6 +17,7 @@ class DataPipelineCore:
         log_dir = "logs"
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
+        log_format = "%%_asctime_%%s [%%_levelname_%%s] - %%_message_%%s"
         log_format = "%(asctime)s [%(levelname)s] - %(message)s"
         logging.basicConfig(
             level=logging.INFO,
@@ -63,12 +64,24 @@ class DataPipelineCore:
         self.logger.info(f"Validation complete. Passed: {len(clean_data)}/{len(data)}")
         return clean_data
 
+    def transform_payload(self, data):
+        transformed = []
+        for record in data:
+            payload = record.copy()
+            payload["action"] = str(payload["action"]).upper()
+            payload["processed_at"] = datetime.now().isoformat()
+            payload["source_system"] = "web_store_front"
+            transformed.append(payload)
+        self.logger.info(f"Transformation node applied formatting to {len(transformed)} nodes")
+        return transformed
+
     def run_pipeline(self):
         self.logger.info("Executing active data node checkpoints")
         self.status = "RUNNING"
         data = self.extract_raw_logs()
         self.save_raw_data(data)
         validated_data = self.validate_records(data)
+        transformed_data = self.transform_payload(validated_data)
         return True
 
 if __name__ == "__main__":
