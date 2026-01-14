@@ -17,7 +17,6 @@ class DataPipelineCore:
         log_dir = "logs"
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
-        log_format = "%%_asctime_%%s [%%_levelname_%%s] - %%_message_%%s"
         log_format = "%(asctime)s [%(levelname)s] - %(message)s"
         logging.basicConfig(
             level=logging.INFO,
@@ -75,6 +74,15 @@ class DataPipelineCore:
         self.logger.info(f"Transformation node applied formatting to {len(transformed)} nodes")
         return transformed
 
+    def load_processed_data(self, data):
+        proc_dir = "data/processed"
+        if not os.path.exists(proc_dir):
+            os.makedirs(proc_dir)
+        file_path = f"{proc_dir}/clean_events_{self.execution_id}.json"
+        with open(file_path, "w") as f:
+            json.dump(data, f, indent=2)
+        self.logger.info(f"Successfully loaded transformed batch into destination sink: {file_path}")
+
     def run_pipeline(self):
         self.logger.info("Executing active data node checkpoints")
         self.status = "RUNNING"
@@ -82,6 +90,7 @@ class DataPipelineCore:
         self.save_raw_data(data)
         validated_data = self.validate_records(data)
         transformed_data = self.transform_payload(validated_data)
+        self.load_processed_data(transformed_data)
         return True
 
 if __name__ == "__main__":
