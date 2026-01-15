@@ -83,14 +83,31 @@ class DataPipelineCore:
             json.dump(data, f, indent=2)
         self.logger.info(f"Successfully loaded transformed batch into destination sink: {file_path}")
 
+    def generate_run_summary(self, total, clean):
+        summary = {
+            "run_id": self.execution_id,
+            "timestamp": datetime.now().isoformat(),
+            "total_extracted": total,
+            "total_processed": clean,
+            "dropped_records": total - clean,
+            "status": "SUCCESS"
+        }
+        meta_dir = "data/metadata"
+        if not os.path.exists(meta_dir):
+            os.makedirs(meta_dir)
+        with open(f"{meta_dir}/summary_{self.execution_id}.json", "w") as f:
+            json.dump(summary, f, indent=2)
+        self.logger.info("Pipeline run summary metadata saved successfully")
+
     def run_pipeline(self):
         self.logger.info("Executing active data node checkpoints")
         self.status = "RUNNING"
-        data = self.extract_raw_logs()
-        self.save_raw_data(data)
-        validated_data = self.validate_records(data)
+        raw_data = self.extract_raw_logs()
+        self.save_raw_data(raw_data)
+        validated_data = self.validate_records(raw_data)
         transformed_data = self.transform_payload(validated_data)
         self.load_processed_data(transformed_data)
+        self.generate_run_summary(len(raw_data), len(transformed_data))
         return True
 
 if __name__ == "__main__":
