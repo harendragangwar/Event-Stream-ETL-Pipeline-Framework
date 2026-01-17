@@ -4,6 +4,7 @@ import json
 import random
 from datetime import datetime
 from utils.logger import setup_production_logging
+from config.settings import get_pipeline_settings
 
 class DataPipelineCore:
     def __init__(self):
@@ -14,8 +15,8 @@ class DataPipelineCore:
         self.logger.info(f"Pipeline Run ID {self.execution_id} launched successfully")
 
     def _load_config(self):
-        self.config = {"batch_size": 500, "retry_limit": 3, "timeout": 30}
-        self.logger.info("Basic pipeline configuration dictionary loaded")
+        self.config = get_pipeline_settings()
+        self.logger.info(f"Pipeline settings system loaded for environment: {self.config['environment']}")
 
     def extract_raw_logs(self):
         self.logger.info("Starting mock data extraction from source endpoint")
@@ -33,7 +34,7 @@ class DataPipelineCore:
         return mock_data
 
     def save_raw_data(self, data):
-        raw_dir = "data/raw"
+        raw_dir = self.config["raw_stage_path"]
         if not os.path.exists(raw_dir):
             os.makedirs(raw_dir)
         file_path = f"{raw_dir}/raw_events_{self.execution_id}.json"
@@ -63,7 +64,7 @@ class DataPipelineCore:
         return transformed
 
     def load_processed_data(self, data):
-        proc_dir = "data/processed"
+        proc_dir = self.config["processed_stage_path"]
         if not os.path.exists(proc_dir):
             os.makedirs(proc_dir)
         file_path = f"{proc_dir}/clean_events_{self.execution_id}.json"
