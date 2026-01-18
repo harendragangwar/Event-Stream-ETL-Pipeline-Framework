@@ -1,10 +1,10 @@
 import os
 import sys
 import json
-import random
 from datetime import datetime
 from utils.logger import setup_production_logging
 from config.settings import get_pipeline_settings
+from extractors.log_extractor import RawLogExtractor
 
 class DataPipelineCore:
     def __init__(self):
@@ -12,26 +12,12 @@ class DataPipelineCore:
         self.status = "INITIALIZED"
         self.logger = setup_production_logging()
         self._load_config()
+        self.extractor = RawLogExtractor(self.logger)
         self.logger.info(f"Pipeline Run ID {self.execution_id} launched successfully")
 
     def _load_config(self):
         self.config = get_pipeline_settings()
         self.logger.info(f"Pipeline settings system loaded for environment: {self.config['environment']}")
-
-    def extract_raw_logs(self):
-        self.logger.info("Starting mock data extraction from source endpoint")
-        events = ["click", "view", "purchase", "cart_add"]
-        mock_data = []
-        for i in range(10):
-            record = {
-                "event_id": f"evt_{random.randint(1000, 9999)}",
-                "timestamp": datetime.now().isoformat(),
-                "action": random.choice(events) if random.random() > 0.1 else None,
-                "user_id": f"usr_{random.randint(1, 100)}"
-            }
-            mock_data.append(record)
-        self.logger.info(f"Successfully extracted {len(mock_data)} raw event logs")
-        return mock_data
 
     def save_raw_data(self, data):
         raw_dir = self.config["raw_stage_path"]
@@ -91,7 +77,7 @@ class DataPipelineCore:
     def run_pipeline(self):
         self.logger.info("Executing active data node checkpoints")
         self.status = "RUNNING"
-        raw_data = self.extract_raw_logs()
+        raw_data = self.extractor.extract_raw_logs()
         self.save_raw_data(raw_data)
         validated_data = self.validate_records(raw_data)
         transformed_data = self.transform_payload(validated_data)
