@@ -5,6 +5,7 @@ from datetime import datetime
 from utils.logger import setup_production_logging
 from config.settings import get_pipeline_settings
 from extractors.log_extractor import RawLogExtractor
+from transformers.data_transformer import LogTransformer
 
 class DataPipelineCore:
     def __init__(self):
@@ -13,6 +14,7 @@ class DataPipelineCore:
         self.logger = setup_production_logging()
         self._load_config()
         self.extractor = RawLogExtractor(self.logger)
+        self.transformer = LogTransformer(self.logger)
         self.logger.info(f"Pipeline Run ID {self.execution_id} launched successfully")
 
     def _load_config(self):
@@ -27,27 +29,6 @@ class DataPipelineCore:
         with open(file_path, "w") as f:
             json.dump(data, f, indent=2)
         self.logger.info(f"Saved raw extraction batch to local path: {file_path}")
-
-    def validate_records(self, data):
-        clean_data = []
-        for record in data:
-            if not record.get("action") or not record.get("event_id"):
-                self.logger.warning(f"Skipping bad record missing critical fields: {record['event_id']}")
-                continue
-            clean_data.append(record)
-        self.logger.info(f"Validation complete. Passed: {len(clean_data)}/{len(data)}")
-        return clean_data
-
-    def transform_payload(self, data):
-        transformed = []
-        for record in data:
-            payload = record.copy()
-            payload["action"] = str(payload["action"]).upper()
-            payload["processed_at"] = datetime.now().isoformat()
-            payload["source_system"] = "web_store_front"
-            transformed.append(payload)
-        self.logger.info(f"Transformation node applied formatting to {len(transformed)} nodes")
-        return transformed
 
     def load_processed_data(self, data):
         proc_dir = self.config["processed_stage_path"]
@@ -79,8 +60,8 @@ class DataPipelineCore:
         self.status = "RUNNING"
         raw_data = self.extractor.extract_raw_logs()
         self.save_raw_data(raw_data)
-        validated_data = self.validate_records(raw_data)
-        transformed_data = self.transform_payload(validated_data)
+        validated_data = self.transformer.validate_records(raw_data)
+        transformed_data = self.transformer.transform_payload(validated_data)
         self.load_processed_data(transformed_data)
         self.generate_run_summary(len(raw_data), len(transformed_data))
         return True
