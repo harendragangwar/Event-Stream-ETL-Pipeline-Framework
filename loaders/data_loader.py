@@ -1,11 +1,9 @@
-import os
+﻿import os
 import json
-
 class DiskDataLoader:
     def __init__(self, logger, config):
         self.logger = logger
         self.config = config
-
     def save_raw_data(self, data, execution_id):
         raw_dir = self.config["raw_stage_path"]
         if not os.path.exists(raw_dir):
@@ -14,7 +12,6 @@ class DiskDataLoader:
         with open(file_path, "w") as f:
             json.dump(data, f, indent=2)
         self.logger.info(f"Saved raw extraction batch to local path: {file_path}")
-
     def load_processed_data(self, data, execution_id):
         proc_dir = self.config["processed_stage_path"]
         if not os.path.exists(proc_dir):
@@ -23,3 +20,9 @@ class DiskDataLoader:
         with open(file_path, "w") as f:
             json.dump(data, f, indent=2)
         self.logger.info(f"Successfully loaded transformed batch into destination sink: {file_path}")
+    def verify_load_sync(self, execution_id):
+        proc_dir = self.config["processed_stage_path"]
+        target = f"{proc_dir}/clean_events_{execution_id}.json"
+        status = os.path.exists(target)
+        self.logger.info(f"Storage load synchronization verification status: {status}")
+        return status
