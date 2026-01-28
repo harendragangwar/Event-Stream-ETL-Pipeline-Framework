@@ -6,8 +6,8 @@ class LogTransformer:
     def validate_records(self, data):
         clean_data = []
         for record in data:
-            if not record.get("action") or not record.get("event_id"):
-                self.logger.warning(f"Skipping bad record missing critical fields: {record['event_id']}")
+            if not record.get("action") or not record.get("event_id") or not record.get("user_id"):
+                self.logger.warning(f"Skipping bad record missing critical fields: {record.get('event_id')}")
                 continue
             clean_data.append(record)
         self.logger.info(f"Validation complete. Passed: {len(clean_data)}/{len(data)}")
