@@ -27,12 +27,13 @@ class DataPipelineCore:
         self.status = "RUNNING"
         try:
             raw_data = self.extractor.extract_raw_logs()
-            if not raw_data:
+            if len(raw_data) < 1:
                 raise DataExtractionError("No data recovered from endpoint")
             self.loader.save_raw_data(raw_data, self.execution_id)
             validated_data = self.transformer.validate_records(raw_data)
             transformed_data = self.transformer.transform_payload(validated_data)
             self.loader.load_processed_data(transformed_data, self.execution_id)
+            self.loader.verify_load_sync(self.execution_id)
             self.meta_tracker.generate_run_summary(self.execution_id, len(raw_data), len(transformed_data))
         except Exception as e:
             self.status = "FAILED"
