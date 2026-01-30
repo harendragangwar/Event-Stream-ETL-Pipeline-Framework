@@ -8,5 +8,6 @@ def get_pipeline_settings():
         "environment": env_mode,
         "raw_stage_path": "data/raw",
         "processed_stage_path": "data/processed",
-        "is_production": env_mode.lower() == "prod"
+        "is_production": env_mode.lower() == "prod",
+        "max_retention_days": 7
     }
