@@ -35,10 +35,13 @@ class DataPipelineCore:
             self.loader.load_processed_data(transformed_data, self.execution_id)
             self.loader.verify_load_sync(self.execution_id)
             self.meta_tracker.generate_run_summary(self.execution_id, len(raw_data), len(transformed_data))
+            self.status = "COMPLETED"
         except Exception as e:
             self.status = "FAILED"
             self.logger.error(f"Pipeline crashed during execution lifecycle: {str(e)}")
             return False
+        finally:
+            self.logger.info(f"Pipeline lifecycle tracking closed with status: {self.status}")
         return True
 if __name__ == "__main__":
     engine = DataPipelineCore()
