@@ -4,6 +4,7 @@ from datetime import datetime
 from utils.logger import setup_production_logging
 from utils.metadata_manager import PipelineMetadataTracker
 from utils.exceptions import DataExtractionError, DataTransformationError
+from utils.system_monitor import PipelineSystemMonitor
 from config.settings import get_pipeline_settings
 from extractors.log_extractor import RawLogExtractor
 from transformers.data_transformer import LogTransformer
@@ -18,6 +19,7 @@ class DataPipelineCore:
         self.transformer = LogTransformer(self.logger)
         self.loader = DiskDataLoader(self.logger, self.config)
         self.meta_tracker = PipelineMetadataTracker(self.logger)
+        self.monitor = PipelineSystemMonitor(self.logger)
         self.logger.info(f"Pipeline Run ID {self.execution_id} launched successfully")
     def _load_config(self):
         self.config = get_pipeline_settings()
@@ -26,6 +28,7 @@ class DataPipelineCore:
         self.logger.info("Executing active data node checkpoints")
         self.status = "RUNNING"
         try:
+            self.monitor.collect_memory_usage()
             raw_data = self.extractor.extract_raw_logs()
             if len(raw_data) < 1:
                 raise DataExtractionError("No data recovered from endpoint")
@@ -41,6 +44,7 @@ class DataPipelineCore:
             self.logger.error(f"Pipeline crashed during execution lifecycle: {str(e)}")
             return False
         finally:
+            self.monitor.collect_memory_usage()
             self.logger.info(f"Pipeline lifecycle tracking closed with status: {self.status}")
         return True
 if __name__ == "__main__":
