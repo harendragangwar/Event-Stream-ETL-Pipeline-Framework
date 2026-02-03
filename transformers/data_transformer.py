@@ -1,5 +1,6 @@
 ﻿import logging
 from datetime import datetime
+from utils.sanitizer import DataSanitizer
 class LogTransformer:
     def __init__(self, logger):
         self.logger = logger
@@ -16,7 +17,7 @@ class LogTransformer:
         transformed = []
         for record in data:
             payload = record.copy()
-            payload["action"] = str(payload["action"]).upper()
+            payload["action"] = DataSanitizer.clean_alphanumeric(str(payload["action"]).upper())
             payload["device_type"] = str(payload.get("device_type", "unknown")).lower()
             payload["processed_at"] = datetime.now().isoformat()
             payload["source_system"] = "web_store_front"
