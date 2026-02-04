@@ -1,10 +1,12 @@
 ﻿import random
+import time
 from datetime import datetime
 class RawLogExtractor:
     def __init__(self, logger):
         self.logger = logger
     def extract_raw_logs(self):
         self.logger.info("Starting mock data extraction from source endpoint")
+        start_time = time.time()
         events = ["click", "view", "purchase", "cart_add"]
         mock_data = []
         for i in range(10):
@@ -16,5 +18,5 @@ class RawLogExtractor:
                 "device_type": random.choice(["mobile", "desktop", "tablet"])
             }
             mock_data.append(record)
-        self.logger.info(f"Successfully extracted {len(mock_data)} raw event logs")
+        self.logger.info(f"Successfully extracted {len(mock_data)} raw event logs in {time.time() - start_time:.4f}s")
         return mock_data
