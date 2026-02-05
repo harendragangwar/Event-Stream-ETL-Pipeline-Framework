@@ -1,4 +1,4 @@
-import os
+﻿import os
 import json
 from datetime import datetime
 class PipelineMetadataTracker:
@@ -16,6 +16,7 @@ class PipelineMetadataTracker:
         meta_dir = "data/metadata"
         if not os.path.exists(meta_dir):
             os.makedirs(meta_dir)
-        with open(f"{meta_dir}/summary_{execution_id}.json", "w") as f:
+        target_path = f"{meta_dir}/summary_{execution_id}.json"
+        with open(target_path, "w", encoding="utf-8") as f:
             json.dump(summary, f, indent=2)
-        self.logger.info("Pipeline run summary metadata saved successfully")
+        self.logger.info(f"Metadata logs flushed securely to target destination checkpoint")
