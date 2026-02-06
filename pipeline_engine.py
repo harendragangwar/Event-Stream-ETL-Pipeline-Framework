@@ -20,7 +20,7 @@ class DataPipelineCore:
         self.loader = DiskDataLoader(self.logger, self.config)
         self.meta_tracker = PipelineMetadataTracker(self.logger)
         self.monitor = PipelineSystemMonitor(self.logger)
-        self.logger.info(f"Pipeline Run ID {self.execution_id} launched successfully")
+        self.logger.info(f"Pipeline initialized with execution token id: {self.execution_id}")
     def _load_config(self):
         self.config = get_pipeline_settings()
         self.logger.info(f"Pipeline settings system loaded for environment: {self.config['environment']}")
