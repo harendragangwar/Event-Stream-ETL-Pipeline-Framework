@@ -6,9 +6,9 @@ class TestTransformer(unittest.TestCase):
         self.logger = setup_production_logging()
         self.transformer = LogTransformer(self.logger)
     def test_payload_transformation(self):
-        mock_raw = [{"event_id": "evt_123", "action": "click", "device_type": "MOBILE"}]
+        mock_raw = [{"event_id": "evt_123", "action": "view", "device_type": "DESKTOP"}]
         res = self.transformer.transform_payload(mock_raw)
-        self.assertEqual(res[0]["action"], "CLICK")
-        self.assertEqual(res[0]["device_type"], "mobile")
+        self.assertEqual(res[0]["action"], "VIEW")
+        self.assertEqual(res[0]["device_type"], "desktop")
 if __name__ == '__main__':
     unittest.main()
