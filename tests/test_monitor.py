@@ -7,6 +7,6 @@ class TestSystemMonitor(unittest.TestCase):
         self.monitor = PipelineSystemMonitor(self.logger)
     def test_telemetry_execution(self):
         res = self.monitor.collect_memory_usage()
-        self.assertIsInstance(res, float)
+        self.assertTrue(res >= 0.0)
 if __name__ == '__main__':
     unittest.main()
