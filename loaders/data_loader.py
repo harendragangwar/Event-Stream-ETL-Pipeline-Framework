@@ -23,6 +23,6 @@ class DiskDataLoader:
     def verify_load_sync(self, execution_id):
         proc_dir = self.config["processed_stage_path"]
         target = f"{proc_dir}/clean_events_{execution_id}.json"
-        status = os.path.exists(target)
+        status = os.path.exists(target) and os.path.getsize(target) > 0
         self.logger.info(f"Storage load synchronization verification status: {status}")
         return status
