@@ -8,5 +8,8 @@ class TestLoader(unittest.TestCase):
         self.loader = DiskDataLoader(self.logger, self.config)
     def test_loader_instance(self):
         self.assertIsNotNone(self.loader)
+    def test_sync_verification_fallback(self):
+        res = self.loader.verify_load_sync("non_existent_id_000")
+        self.assertFalse(res)
 if __name__ == '__main__':
     unittest.main()
