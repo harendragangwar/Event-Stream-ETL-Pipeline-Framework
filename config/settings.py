@@ -2,7 +2,7 @@
 def get_pipeline_settings():
     env_mode = os.getenv("PIPELINE_ENV", "dev")
     return {
-        "batch_size": 1000,
+        "batch_size": 1500,
         "retry_limit": 5,
         "timeout": 60,
         "environment": env_mode,
