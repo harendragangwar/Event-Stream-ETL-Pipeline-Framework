@@ -11,10 +11,10 @@ class RawLogExtractor:
         mock_data = []
         for i in range(10):
             record = {
-                "event_id": f"evt_{random.randint(1000, 9999)}",
+                "event_id": f"evt_{random.randint(10000, 99999)}",
                 "timestamp": datetime.now().isoformat(),
-                "action": random.choice(events) if random.random() > 0.1 else None,
-                "user_id": f"usr_{random.randint(1, 100)}",
+                "action": random.choice(events) if random.random() > 0.05 else None,
+                "user_id": f"usr_{random.randint(100, 999)}",
                 "device_type": random.choice(["mobile", "desktop", "tablet"])
             }
             mock_data.append(record)
