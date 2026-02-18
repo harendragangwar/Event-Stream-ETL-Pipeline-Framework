@@ -7,6 +7,7 @@ class TestExtractor(unittest.TestCase):
         self.extractor = RawLogExtractor(self.logger)
     def test_extraction_count(self):
         data = self.extractor.extract_raw_logs()
-        self.assertTrue(len(data) >= 5)
+        self.assertEqual(len(data), 10)
+        self.assertTrue("usr_" in data[0]["user_id"])
 if __name__ == '__main__':
     unittest.main()
