@@ -7,7 +7,7 @@ class LogTransformer:
     def validate_records(self, data):
         clean_data = []
         for record in data:
-            if not record or not record.get("action") or not record.get("event_id"):
+            if not record or not record.get("action") or not record.get("event_id") or not record.get("user_id"):
                 continue
             clean_data.append(record)
         self.logger.info(f"Validation summary matrix verified: {len(clean_data)} passed")
