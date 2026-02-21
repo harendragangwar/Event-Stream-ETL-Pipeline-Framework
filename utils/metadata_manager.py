@@ -11,7 +11,7 @@ class PipelineMetadataTracker:
             "total_extracted": total,
             "total_processed": clean,
             "dropped_records": total - clean,
-            "engine_version": "1.2.0",
+            "engine_version": "1.2.4",
             "status": "SUCCESS"
         }
         if not os.path.exists(meta_dir):
