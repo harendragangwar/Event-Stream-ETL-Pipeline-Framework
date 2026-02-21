@@ -11,7 +11,7 @@ from transformers.data_transformer import LogTransformer
 from loaders.data_loader import DiskDataLoader
 class DataPipelineCore:
     def __init__(self):
-        self.version = "1.2.3"
+        self.version = "1.2.4"
         self.execution_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.status = "INITIALIZED"
         self.logger = setup_production_logging()
@@ -21,7 +21,7 @@ class DataPipelineCore:
         self.loader = DiskDataLoader(self.logger, self.config)
         self.meta_tracker = PipelineMetadataTracker(self.logger)
         self.monitor = PipelineSystemMonitor(self.logger)
-        self.logger.info(f"Pipeline active core initialization: v{self.version}")
+        self.logger.info(f"Pipeline running core v{self.version} node execution token id: {self.execution_id}")
     def _load_config(self):
         self.config = get_pipeline_settings()
     def run_pipeline(self):
@@ -41,10 +41,11 @@ class DataPipelineCore:
             self.status = "COMPLETED"
         except Exception as e:
             self.status = "FAILED"
-            self.logger.error(f"Pipeline crashed: {str(e)}")
+            self.logger.error(f"Pipeline crashed during execution lifecycle: {str(e)}")
             return False
         finally:
             self.monitor.collect_memory_usage()
+            self.logger.info(f"Pipeline lifecycle tracking closed with status: {self.status}")
         return True
 if __name__ == "__main__":
     engine = DataPipelineCore()
