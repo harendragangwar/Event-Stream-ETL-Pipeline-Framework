@@ -9,9 +9,10 @@ from config.settings import get_pipeline_settings
 from extractors.log_extractor import RawLogExtractor
 from transformers.data_transformer import LogTransformer
 from loaders.data_loader import DiskDataLoader
+from database.warehouse_engine import DatabaseManager
 class DataPipelineCore:
     def __init__(self):
-        self.version = "1.2.4"
+        self.version = "1.3.0"
         self.execution_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.status = "INITIALIZED"
         self.logger = setup_production_logging()
@@ -21,11 +22,12 @@ class DataPipelineCore:
         self.loader = DiskDataLoader(self.logger, self.config)
         self.meta_tracker = PipelineMetadataTracker(self.logger)
         self.monitor = PipelineSystemMonitor(self.logger)
-        self.logger.info(f"Pipeline running core v{self.version} node execution token id: {self.execution_id}")
+        self.db_manager = DatabaseManager(self.logger)
+        self.logger.info(f"Pipeline migrating engine layout: core v{self.version} linked with warehouse layers")
     def _load_config(self):
         self.config = get_pipeline_settings()
     def run_pipeline(self):
-        self.logger.info("Executing active data node checkpoints")
+        self.logger.info("Executing active data warehouse framework checkpoints")
         self.status = "RUNNING"
         try:
             self.monitor.collect_memory_usage()
@@ -37,15 +39,15 @@ class DataPipelineCore:
             transformed_data = self.transformer.transform_payload(validated_data)
             self.loader.load_processed_data(transformed_data, self.execution_id)
             self.loader.verify_load_sync(self.execution_id)
+            self.db_manager.insert_clean_records(transformed_data)
             self.meta_tracker.generate_run_summary(self.execution_id, len(raw_data), len(transformed_data))
             self.status = "COMPLETED"
         except Exception as e:
             self.status = "FAILED"
-            self.logger.error(f"Pipeline crashed during execution lifecycle: {str(e)}")
+            self.logger.error(f"Warehouse pipeline lifecycle broken: {str(e)}")
             return False
         finally:
             self.monitor.collect_memory_usage()
-            self.logger.info(f"Pipeline lifecycle tracking closed with status: {self.status}")
         return True
 if __name__ == "__main__":
     engine = DataPipelineCore()
