@@ -46,3 +46,13 @@ class DatabaseManager:
                     self.logger.warning(f"Failed to insert row token {rec.get('event_id')}: {str(e)}")
             conn.commit()
         self.logger.info(f"Database sink transaction completed. Synced {inserted_count} table records")
+    def compute_activity_metrics(self):
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT action, COUNT(*) FROM ecommerce_events GROUP BY action
+            ''')
+            metrics = cursor.fetchall()
+            summary = {action: count for action, count in metrics}
+            self.logger.info(f"Aggregated database metrics calculated successfully: {str(summary)}")
+            return summary
