@@ -12,7 +12,7 @@ from loaders.data_loader import DiskDataLoader
 from database.warehouse_engine import DatabaseManager
 class DataPipelineCore:
     def __init__(self):
-        self.version = "1.3.0"
+        self.version = "1.3.1"
         self.execution_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.status = "INITIALIZED"
         self.logger = setup_production_logging()
@@ -23,7 +23,7 @@ class DataPipelineCore:
         self.meta_tracker = PipelineMetadataTracker(self.logger)
         self.monitor = PipelineSystemMonitor(self.logger)
         self.db_manager = DatabaseManager(self.logger)
-        self.logger.info(f"Pipeline migrating engine layout: core v{self.version} linked with warehouse layers")
+        self.logger.info(f"Pipeline engine scale deployment initialized successfully v{self.version}")
     def _load_config(self):
         self.config = get_pipeline_settings()
     def run_pipeline(self):
@@ -40,6 +40,7 @@ class DataPipelineCore:
             self.loader.load_processed_data(transformed_data, self.execution_id)
             self.loader.verify_load_sync(self.execution_id)
             self.db_manager.insert_clean_records(transformed_data)
+            self.db_manager.compute_activity_metrics()
             self.meta_tracker.generate_run_summary(self.execution_id, len(raw_data), len(transformed_data))
             self.status = "COMPLETED"
         except Exception as e:
