@@ -19,11 +19,12 @@ class DatabaseManager:
                     device_type TEXT,
                     timestamp TEXT,
                     processed_at TEXT,
-                    source_system TEXT
+                    source_system TEXT,
+                    session_duration_sec INTEGER
                 )
             ''')
             conn.commit()
-        self.logger.info("Local storage warehouse structures initialized successfully")
+        self.logger.info("Local storage warehouse structures upgraded with session columns")
     def insert_clean_records(self, record_list):
         if not record_list:
             return
@@ -34,12 +35,12 @@ class DatabaseManager:
                 try:
                     cursor.execute('''
                         INSERT OR REPLACE INTO ecommerce_events 
-                        (event_id, user_id, action, device_type, timestamp, processed_at, source_system)
-                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                        (event_id, user_id, action, device_type, timestamp, processed_at, source_system, session_duration_sec)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                     ''', (
                         rec.get("event_id"), rec.get("user_id"), rec.get("action"),
                         rec.get("device_type"), rec.get("timestamp"), rec.get("processed_at"),
-                        rec.get("source_system")
+                        rec.get("source_system"), rec.get("session_duration_sec", 0)
                     ))
                     inserted_count += 1
                 except Exception as e:
