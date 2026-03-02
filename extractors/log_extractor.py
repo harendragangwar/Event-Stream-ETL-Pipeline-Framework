@@ -15,7 +15,8 @@ class RawLogExtractor:
                 "timestamp": datetime.now().isoformat(),
                 "action": random.choice(events) if random.random() > 0.05 else None,
                 "user_id": f"usr_{random.randint(100, 999)}",
-                "device_type": random.choice(["mobile", "desktop", "tablet"])
+                "device_type": random.choice(["mobile", "desktop", "tablet"]),
+                "session_duration_sec": random.randint(10, 1800)
             }
             mock_data.append(record)
         self.logger.info(f"Successfully extracted {len(mock_data)} raw event logs in {time.time() - start_time:.4f}s")
