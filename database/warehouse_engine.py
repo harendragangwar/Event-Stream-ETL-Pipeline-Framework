@@ -51,9 +51,9 @@ class DatabaseManager:
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                SELECT action, COUNT(*) FROM ecommerce_events GROUP BY action
+                SELECT action, COUNT(*), AVG(session_duration_sec) FROM ecommerce_events GROUP BY action
             ''')
             metrics = cursor.fetchall()
-            summary = {action: count for action, count in metrics}
-            self.logger.info(f"Aggregated database metrics calculated successfully: {str(summary)}")
+            summary = {action: {"count": count, "avg_duration": round(avg_dur, 2)} for action, count, avg_dur in metrics}
+            self.logger.info(f"Extended database analytics metrics compiled: {str(summary)}")
             return summary
