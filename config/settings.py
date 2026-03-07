@@ -10,5 +10,6 @@ def get_pipeline_settings():
         "processed_stage_path": "data/processed",
         "metadata_stage_path": "data/metadata",
         "is_production": env_mode.lower() == "prod",
-        "max_retention_days": 14
+        "max_retention_days": 14,
+        "warehouse_db_path": "data/pipeline_warehouse.db"
     }
