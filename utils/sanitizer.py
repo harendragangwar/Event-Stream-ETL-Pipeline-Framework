@@ -4,5 +4,6 @@ class DataSanitizer:
     def clean_alphanumeric(text):
         if not text:
             return ""
-        cleaned = re.sub(r'[^a-zA-Z0-9_\-\s]', '', str(text))
+        safe_text = str(text).encode('ascii', 'ignore').decode('ascii')
+        cleaned = re.sub(r'[^a-zA-Z0-9_\-\s]', '', safe_text)
         return " ".join(cleaned.split())
