@@ -25,4 +25,6 @@ class DiskDataLoader:
         target = f"{proc_dir}/clean_events_{execution_id}.json"
         status = os.path.exists(target) and os.path.getsize(target) > 0
         self.logger.info(f"Storage load synchronization verification status: {status}")
+        if not status:
+            self.logger.error(f"Downstream transaction check mismatch for execution node: {execution_id}")
         return status
