@@ -12,7 +12,7 @@ from loaders.data_loader import DiskDataLoader
 from database.warehouse_engine import DatabaseManager
 class DataPipelineCore:
     def __init__(self):
-        self.version = "1.3.2"
+        self.version = "1.3.3"
         self.execution_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.status = "INITIALIZED"
         self.logger = setup_production_logging()
@@ -23,7 +23,7 @@ class DataPipelineCore:
         self.meta_tracker = PipelineMetadataTracker(self.logger)
         self.monitor = PipelineSystemMonitor(self.logger)
         self.db_manager = DatabaseManager(self.logger, db_path=self.config["warehouse_db_path"])
-        self.logger.info(f"Pipeline orchestration mapping engine version v{self.version} initialized successfully")
+        self.logger.info(f"Pipeline mapping layout core active session setup v{self.version}")
     def _load_config(self):
         self.config = get_pipeline_settings()
     def run_pipeline(self):
