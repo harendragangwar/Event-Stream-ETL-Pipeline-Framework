@@ -3,7 +3,7 @@ import sys
 from datetime import datetime
 from utils.logger import setup_production_logging
 from utils.metadata_manager import PipelineMetadataTracker
-from utils.exceptions import DataExtractionError, DataTransformationError
+from utils.exceptions import DataExtractionError, DataTransformationError, DatabaseTransactionError
 from utils.system_monitor import PipelineSystemMonitor
 from config.settings import get_pipeline_settings
 from extractors.log_extractor import RawLogExtractor
@@ -12,7 +12,7 @@ from loaders.data_loader import DiskDataLoader
 from database.warehouse_engine import DatabaseManager
 class DataPipelineCore:
     def __init__(self):
-        self.version = "1.3.3"
+        self.version = "1.3.4"
         self.execution_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.status = "INITIALIZED"
         self.logger = setup_production_logging()
@@ -23,7 +23,7 @@ class DataPipelineCore:
         self.meta_tracker = PipelineMetadataTracker(self.logger)
         self.monitor = PipelineSystemMonitor(self.logger)
         self.db_manager = DatabaseManager(self.logger, db_path=self.config["warehouse_db_path"])
-        self.logger.info(f"Pipeline mapping layout core active session setup v{self.version}")
+        self.logger.info(f"Pipeline engine tracking deployment run active v{self.version}")
     def _load_config(self):
         self.config = get_pipeline_settings()
     def run_pipeline(self):
@@ -43,6 +43,10 @@ class DataPipelineCore:
             self.db_manager.compute_activity_metrics()
             self.meta_tracker.generate_run_summary(self.execution_id, len(raw_data), len(transformed_data))
             self.status = "COMPLETED"
+        except DatabaseTransactionError as dbe:
+            self.status = "CRITICAL_FAULT"
+            self.logger.error(f"Database write crash isolation applied: {str(dbe)}")
+            return False
         except Exception as e:
             self.status = "FAILED"
             self.logger.error(f"Warehouse pipeline lifecycle broken: {str(e)}")
