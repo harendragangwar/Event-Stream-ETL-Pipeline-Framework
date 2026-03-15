@@ -1,5 +1,6 @@
 ﻿import sqlite3
 import os
+from utils.exceptions import DatabaseTransactionError
 class DatabaseManager:
     def __init__(self, logger, db_path="data/pipeline_warehouse.db"):
         self.logger = logger
@@ -29,10 +30,10 @@ class DatabaseManager:
         if not record_list:
             return
         inserted_count = 0
-        with sqlite3.connect(self.db_path) as conn:
-            cursor = conn.cursor()
-            for rec in record_list:
-                try:
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                for rec in record_list:
                     cursor.execute('''
                         INSERT OR REPLACE INTO ecommerce_events 
                         (event_id, user_id, action, device_type, timestamp, processed_at, source_system, session_duration_sec)
@@ -43,9 +44,9 @@ class DatabaseManager:
                         rec.get("source_system"), rec.get("session_duration_sec", 0)
                     ))
                     inserted_count += 1
-                except Exception as e:
-                    self.logger.warning(f"Failed to insert row token {rec.get('event_id')}: {str(e)}")
-            conn.commit()
+                conn.commit()
+        except Exception as e:
+            raise DatabaseTransactionError(f"Database write failure: {str(e)}")
         self.logger.info(f"Database sink transaction completed. Synced {inserted_count} table records")
     def compute_activity_metrics(self):
         with sqlite3.connect(self.db_path) as conn:
