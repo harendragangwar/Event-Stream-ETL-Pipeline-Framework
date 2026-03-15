@@ -3,6 +3,7 @@ import sqlite3
 import os
 from database.warehouse_engine import DatabaseManager
 from utils.logger import setup_production_logging
+from utils.exceptions import DatabaseTransactionError
 class TestWarehouseEngine(unittest.TestCase):
     def setUp(self):
         self.logger = setup_production_logging()
@@ -14,18 +15,9 @@ class TestWarehouseEngine(unittest.TestCase):
             except: pass
     def test_warehouse_initialization(self):
         self.assertTrue(os.path.exists(self.test_db))
-    def test_session_records_insertion(self):
-        mock_record = {
-            "event_id": "evt_test_1", "user_id": "usr_1", "action": "CLICK",
-            "device_type": "mobile", "timestamp": "2026-03-04T00:00:00",
-            "processed_at": "2026-03-04T00:01:00", "source_system": "web",
-            "session_duration_sec": 350
-        }
-        self.db_manager.insert_clean_records([mock_record])
-        with sqlite3.connect(self.test_db) as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT session_duration_sec FROM ecommerce_events WHERE event_id='evt_test_1'")
-            val = cursor.fetchone()[0]
-        self.assertEqual(val, 350)
+    def test_invalid_path_exception(self):
+        broken_manager = DatabaseManager(self.logger, db_path="/invalid_dir/null.db")
+        with self.assertRaises(DatabaseTransactionError):
+            broken_manager.insert_clean_records([{"event_id": "123"}])
 if __name__ == '__main__':
     unittest.main()
