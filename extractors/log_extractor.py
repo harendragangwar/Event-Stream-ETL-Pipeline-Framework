@@ -4,12 +4,12 @@ from datetime import datetime
 class RawLogExtractor:
     def __init__(self, logger):
         self.logger = logger
-    def extract_raw_logs(self):
+    def extract_raw_logs(self, batch_size=50):
         self.logger.info("Starting mock data extraction from source endpoint")
         start_time = time.time()
         events = ["click", "view", "purchase", "cart_add"]
         mock_data = []
-        for i in range(10):
+        for i in range(batch_size):
             record = {
                 "event_id": f"evt_{random.randint(10000, 99999)}",
                 "timestamp": datetime.now().isoformat(),
