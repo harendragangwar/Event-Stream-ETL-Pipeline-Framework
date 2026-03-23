@@ -10,9 +10,10 @@ from extractors.log_extractor import RawLogExtractor
 from transformers.data_transformer import LogTransformer
 from loaders.data_loader import DiskDataLoader
 from database.warehouse_engine import DatabaseManager
+
 class DataPipelineCore:
     def __init__(self):
-        self.version = "1.3.4"
+        self.version = "1.4.0"
         self.execution_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.status = "INITIALIZED"
         self.logger = setup_production_logging()
@@ -23,15 +24,19 @@ class DataPipelineCore:
         self.meta_tracker = PipelineMetadataTracker(self.logger)
         self.monitor = PipelineSystemMonitor(self.logger)
         self.db_manager = DatabaseManager(self.logger, db_path=self.config["warehouse_db_path"])
-        self.logger.info(f"Pipeline engine tracking deployment run active v{self.version}")
+        self.logger.info(f"Pipeline scale core v{self.version} setup complete with dynamic batching properties")
+
     def _load_config(self):
         self.config = get_pipeline_settings()
+
     def run_pipeline(self):
         self.logger.info("Executing active data warehouse framework checkpoints")
         self.status = "RUNNING"
         try:
             self.monitor.collect_memory_usage()
-            raw_data = self.extractor.extract_raw_logs()
+            target_batch = self.config.get("batch_size", 5000)
+            target_batch = min(target_batch, 100)
+            raw_data = self.extractor.extract_raw_logs(batch_size=target_batch)
             if len(raw_data) < 1:
                 raise DataExtractionError("No data recovered from endpoint")
             self.loader.save_raw_data(raw_data, self.execution_id)
@@ -54,6 +59,7 @@ class DataPipelineCore:
         finally:
             self.monitor.collect_memory_usage()
         return True
+
 if __name__ == "__main__":
     engine = DataPipelineCore()
     engine.run_pipeline()
