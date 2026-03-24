@@ -65,9 +65,20 @@ class DatabaseManager:
                     SELECT action, COUNT(*), AVG(session_duration_sec) FROM ecommerce_events GROUP BY action
                 ''')
                 metrics = cursor.fetchall()
-                summary = {action: {"count": count, "avg_duration": round(avg_dur, 2)} for action, count, avg_dur in metrics}
-                self.logger.info(f"Database analytics compiled: {str(summary)}")
-                return summary
+                action_summary = {action: {"count": count, "avg_duration": round(avg_dur, 2)} for action, count, avg_dur in metrics}
+                
+                cursor.execute('''
+                    SELECT device_type, COUNT(*) FROM ecommerce_events GROUP BY device_type
+                ''')
+                device_metrics = cursor.fetchall()
+                device_summary = {device: count for device, count in device_metrics}
+                
+                compiled_metrics = {
+                    "actions": action_summary,
+                    "devices": device_summary
+                }
+                self.logger.info(f"Warehouse advanced metrics compiled: {str(compiled_metrics)}")
+                return compiled_metrics
         except Exception as e:
             self.logger.error(f"Failed to query database metric states: {str(e)}")
             return {}
