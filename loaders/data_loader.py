@@ -24,7 +24,9 @@ class DiskDataLoader:
         proc_dir = self.config["processed_stage_path"]
         target = f"{proc_dir}/clean_events_{execution_id}.json"
         status = os.path.exists(target) and os.path.getsize(target) > 0
-        self.logger.info(f"Storage load synchronization verification status: {status}")
-        if not status:
+        if status:
+            file_size_kb = os.path.getsize(target) / 1024
+            self.logger.info(f"Storage load verification clear. Node size: {file_size_kb:.2f} KB")
+        else:
             self.logger.error(f"Downstream transaction check mismatch for execution node: {execution_id}")
         return status
