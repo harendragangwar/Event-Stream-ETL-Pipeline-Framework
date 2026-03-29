@@ -11,6 +11,9 @@ class LogTransformer:
         for record in data:
             if not record or not record.get("action") or not record.get("event_id"):
                 continue
+            if not DataSanitizer.is_valid_uuid(record.get("event_id")):
+                self.logger.warning(f"Malformed record identifier discarded: {record.get('event_id')}")
+                continue
             clean_data.append(record)
         self.logger.info(f"Validation summary matrix verified: {len(clean_data)} passed")
         return clean_data
