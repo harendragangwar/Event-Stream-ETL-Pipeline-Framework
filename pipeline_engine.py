@@ -13,7 +13,7 @@ from database.warehouse_engine import DatabaseManager
 
 class DataPipelineCore:
     def __init__(self):
-        self.version = "1.4.0"
+        self.version = "1.4.1"
         self.execution_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.status = "INITIALIZED"
         self.logger = setup_production_logging()
@@ -24,7 +24,7 @@ class DataPipelineCore:
         self.meta_tracker = PipelineMetadataTracker(self.logger)
         self.monitor = PipelineSystemMonitor(self.logger)
         self.db_manager = DatabaseManager(self.logger, db_path=self.config["warehouse_db_path"])
-        self.logger.info(f"Pipeline scale core v{self.version} setup complete with dynamic batching properties")
+        self.logger.info(f"Pipeline running version {self.version} execution initialized")
 
     def _load_config(self):
         self.config = get_pipeline_settings()
@@ -34,8 +34,7 @@ class DataPipelineCore:
         self.status = "RUNNING"
         try:
             self.monitor.collect_memory_usage()
-            target_batch = self.config.get("batch_size", 5000)
-            target_batch = min(target_batch, 100)
+            target_batch = min(self.config.get("batch_size", 1000), 100)
             raw_data = self.extractor.extract_raw_logs(batch_size=target_batch)
             if len(raw_data) < 1:
                 raise DataExtractionError("No data recovered from endpoint")
@@ -48,10 +47,6 @@ class DataPipelineCore:
             self.db_manager.compute_activity_metrics()
             self.meta_tracker.generate_run_summary(self.execution_id, len(raw_data), len(transformed_data))
             self.status = "COMPLETED"
-        except DatabaseTransactionError as dbe:
-            self.status = "CRITICAL_FAULT"
-            self.logger.error(f"Database write crash isolation applied: {str(dbe)}")
-            return False
         except Exception as e:
             self.status = "FAILED"
             self.logger.error(f"Warehouse pipeline lifecycle broken: {str(e)}")
