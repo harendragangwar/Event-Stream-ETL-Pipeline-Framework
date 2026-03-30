@@ -54,7 +54,7 @@ class DatabaseManager:
                     inserted_count += 1
                 conn.commit()
         except Exception as e:
-            raise DatabaseTransactionError(f"Database write failure: {str(e)}")
+            raise DatabaseTransactionError(f"Database transaction aborted: {str(e)}")
         self.logger.info(f"Database sink transaction completed. Synced {inserted_count} table records")
 
     def compute_activity_metrics(self):
