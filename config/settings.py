@@ -23,7 +23,7 @@ def get_pipeline_settings():
         "batch_size": selected_profile["batch_size"],
         "retry_limit": selected_profile["retry_limit"],
         "timeout": selected_profile["timeout"],
-        "environment": env_mode,
+        "environment": env_mode.lower(),
         "raw_stage_path": "data/raw",
         "processed_stage_path": "data/processed",
         "metadata_stage_path": "data/metadata",
