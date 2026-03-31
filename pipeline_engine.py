@@ -3,7 +3,7 @@ import sys
 from datetime import datetime
 from utils.logger import setup_production_logging
 from utils.metadata_manager import PipelineMetadataTracker
-from utils.exceptions import DataExtractionError, DataTransformationError, DatabaseTransactionError
+from utils.exceptions import DataExtractionError, DataTransformationError, DatabaseTransactionError, StorageLoadError
 from utils.system_monitor import PipelineSystemMonitor
 from config.settings import get_pipeline_settings
 from extractors.log_extractor import RawLogExtractor
@@ -13,7 +13,7 @@ from database.warehouse_engine import DatabaseManager
 
 class DataPipelineCore:
     def __init__(self):
-        self.version = "1.4.1"
+        self.version = "1.4.2"
         self.execution_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.status = "INITIALIZED"
         self.logger = setup_production_logging()
@@ -24,7 +24,7 @@ class DataPipelineCore:
         self.meta_tracker = PipelineMetadataTracker(self.logger)
         self.monitor = PipelineSystemMonitor(self.logger)
         self.db_manager = DatabaseManager(self.logger, db_path=self.config["warehouse_db_path"])
-        self.logger.info(f"Pipeline running version {self.version} execution initialized")
+        self.logger.info(f"Pipeline scale core v{self.version} setup complete with system telemetry checks")
 
     def _load_config(self):
         self.config = get_pipeline_settings()
@@ -34,6 +34,7 @@ class DataPipelineCore:
         self.status = "RUNNING"
         try:
             self.monitor.collect_memory_usage()
+            self.monitor.check_disk_space()
             target_batch = min(self.config.get("batch_size", 1000), 100)
             raw_data = self.extractor.extract_raw_logs(batch_size=target_batch)
             if len(raw_data) < 1:
@@ -41,12 +42,17 @@ class DataPipelineCore:
             self.loader.save_raw_data(raw_data, self.execution_id)
             validated_data = self.transformer.validate_records(raw_data)
             transformed_data = self.transformer.transform_payload(validated_data)
+            self.loader.open_stage_lock = True if hasattr(self.loader, 'open_stage_lock') else False
             self.loader.load_processed_data(transformed_data, self.execution_id)
             self.loader.verify_load_sync(self.execution_id)
             self.db_manager.insert_clean_records(transformed_data)
             self.db_manager.compute_activity_metrics()
             self.meta_tracker.generate_run_summary(self.execution_id, len(raw_data), len(transformed_data))
             self.status = "COMPLETED"
+        except StorageLoadError as sle:
+            self.status = "STORAGE_FAULT"
+            self.logger.error(f"IO write stage path failure caught: {str(sle)}")
+            return False
         except Exception as e:
             self.status = "FAILED"
             self.logger.error(f"Warehouse pipeline lifecycle broken: {str(e)}")
