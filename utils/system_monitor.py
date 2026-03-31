@@ -1,7 +1,10 @@
 ﻿import os
+import sys
+
 class PipelineSystemMonitor:
     def __init__(self, logger):
         self.logger = logger
+
     def collect_memory_usage(self):
         try:
             import psutil
@@ -10,5 +13,16 @@ class PipelineSystemMonitor:
             self.logger.info(f"System memory tracking verification metric: {mem_mb:.2f} MB")
             return mem_mb
         except Exception:
-            self.logger.warning("Native process telemetry matrix extraction offline")
+            self.logger.warning("Native process telemetry profiling metrics missing or offline")
+            return 0.0
+
+    def check_disk_space(self, target_path="."):
+        try:
+            import shutil
+            total, used, free = shutil.disk_usage(target_path)
+            free_gb = free / (1024**3)
+            self.logger.info(f"Available workspace storage capacity: {free_gb:.2f} GB free")
+            return free_gb
+        except Exception:
+            self.logger.warning("Storage volume telemetry metrics checking unavailable")
             return 0.0
