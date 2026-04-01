@@ -54,30 +54,30 @@ class DatabaseManager:
                     inserted_count += 1
                 conn.commit()
         except Exception as e:
-            raise DatabaseTransactionError(f"Database transaction aborted: {str(e)}")
+            raise DatabaseTransactionError(f"Database write failure: {str(e)}")
         self.logger.info(f"Database sink transaction completed. Synced {inserted_count} table records")
 
     def compute_activity_metrics(self):
         try:
             with sqlite3.connect(self.db_path, timeout=30.0) as conn:
                 cursor = conn.cursor()
-                cursor.execute('''
-                    SELECT action, COUNT(*), AVG(session_duration_sec) FROM ecommerce_events GROUP BY action
-                ''')
+                cursor.execute('SELECT action, COUNT(*), AVG(session_duration_sec) FROM ecommerce_events GROUP BY action')
                 metrics = cursor.fetchall()
                 action_summary = {action: {"count": count, "avg_duration": round(avg_dur, 2)} for action, count, avg_dur in metrics}
                 
-                cursor.execute('''
-                    SELECT device_type, COUNT(*) FROM ecommerce_events GROUP BY device_type
-                ''')
+                cursor.execute('SELECT device_type, COUNT(*) FROM ecommerce_events GROUP BY device_type')
                 device_metrics = cursor.fetchall()
                 device_summary = {device: count for device, count in device_metrics}
                 
+                cursor.execute('SELECT COUNT(DISTINCT user_id) FROM ecommerce_events')
+                unique_users = cursor.fetchone()[0]
+                
                 compiled_metrics = {
                     "actions": action_summary,
-                    "devices": device_summary
+                    "devices": device_summary,
+                    "unique_users_count": unique_users
                 }
-                self.logger.info(f"Warehouse advanced metrics compiled: {str(compiled_metrics)}")
+                self.logger.info(f"Warehouse advanced metrics compiled with user metrics: {str(compiled_metrics)}")
                 return compiled_metrics
         except Exception as e:
             self.logger.error(f"Failed to query database metric states: {str(e)}")
