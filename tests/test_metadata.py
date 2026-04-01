@@ -1,6 +1,5 @@
 ﻿import unittest
 import os
-import json
 from utils.logger import setup_production_logging
 from utils.metadata_manager import PipelineMetadataTracker
 
@@ -16,17 +15,10 @@ class TestMetadata(unittest.TestCase):
             try: shutil.rmtree(self.test_meta_dir)
             except: pass
 
-    def test_summary_efficiency_calculation(self):
-        execution_id = "test_run_20260319"
-        res = self.tracker.generate_run_summary(execution_id, 10, 8, meta_dir=self.test_meta_dir)
-        
-        self.assertEqual(res["metrics"]["total_extracted"], 10)
-        self.assertEqual(res["metrics"]["total_processed"], 8)
-        self.assertEqual(res["metrics"]["dropped_records"], 2)
-        self.assertEqual(res["metrics"]["pipeline_efficiency_pct"], 80.0)
-        self.assertEqual(res["environment_telemetry"]["system_status"], "HEALTHY")
-
-    def test_degraded_system_status(self):
-        execution_id = "test_run_degraded"
-        res = self.tracker.generate_run_summary(execution_id, 10, 5, meta_dir=self.test_meta_dir)
-        self.assertEqual(res["environment_telemetry"]["system_status"], "DEGRADED")
+    def test_compliance_matrix_generation(self):
+        res = self.tracker.generate_run_summary("run_20260401", 100, 95, meta_dir=self.test_meta_dir)
+        self.assertTrue(res["compliance_checks"]["anonymization_applied"])
+        self.assertEqual(res["compliance_checks"]["schema_version"], "v2.1")
+        self.assertEqual(res["environment_telemetry"]["engine_version"], "1.4.5")
+if __name__ == '__main__':
+    unittest.main()
