@@ -7,13 +7,17 @@ def get_pipeline_settings():
             "batch_size": 5000,
             "retry_limit": 5,
             "timeout": 120,
-            "max_retention_days": 30
+            "max_retention_days": 30,
+            "enable_compression": True,
+            "cleanup_threshold_pct": 85.0
         },
         "dev": {
             "batch_size": 1000,
             "retry_limit": 3,
             "timeout": 45,
-            "max_retention_days": 7
+            "max_retention_days": 7,
+            "enable_compression": False,
+            "cleanup_threshold_pct": 95.0
         }
     }
     
@@ -29,5 +33,7 @@ def get_pipeline_settings():
         "metadata_stage_path": "data/metadata",
         "is_production": env_mode.lower() == "prod",
         "max_retention_days": selected_profile["max_retention_days"],
+        "enable_compression": selected_profile["enable_compression"],
+        "cleanup_threshold": selected_profile["cleanup_threshold_pct"],
         "warehouse_db_path": "data/pipeline_warehouse.db"
     }
