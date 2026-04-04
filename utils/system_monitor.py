@@ -21,7 +21,10 @@ class PipelineSystemMonitor:
             import shutil
             total, used, free = shutil.disk_usage(target_path)
             free_gb = free / (1024**3)
-            self.logger.info(f"Available workspace storage capacity: {free_gb:.2f} GB free")
+            used_pct = (used / total) * 100
+            self.logger.info(f"Available workspace storage capacity: {free_gb:.2f} GB free ({used_pct:.1f}% used)")
+            if used_pct > 90.0:
+                self.logger.critical("Workspace disk storage threshold breached risk checkpoint active")
             return free_gb
         except Exception:
             self.logger.warning("Storage volume telemetry metrics checking unavailable")
