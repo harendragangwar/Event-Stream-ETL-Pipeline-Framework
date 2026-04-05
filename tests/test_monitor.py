@@ -14,5 +14,6 @@ class TestSystemMonitor(unittest.TestCase):
     def test_storage_telemetry_bounds(self):
         free_gb = self.monitor.check_disk_space()
         self.assertIsInstance(free_gb, float)
+        self.assertTrue(free_gb >= 0.0)
 if __name__ == '__main__':
     unittest.main()
