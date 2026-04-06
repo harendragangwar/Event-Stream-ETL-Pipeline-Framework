@@ -20,12 +20,16 @@ class PipelineMetadataTracker:
                 "pipeline_efficiency_pct": efficiency_rate
             },
             "environment_telemetry": {
-                "engine_version": "1.4.5",
+                "engine_version": "1.5.2",
                 "system_status": "HEALTHY" if dropped / (total if total > 0 else 1) < 0.2 else "DEGRADED"
             },
             "compliance_checks": {
                 "anonymization_applied": True,
                 "schema_version": "v2.1"
+            },
+            "resource_profiling": {
+                "allocated_nodes": 1,
+                "orchestration_layer": "native_core"
             }
         }
         
@@ -36,5 +40,5 @@ class PipelineMetadataTracker:
         with open(target_path, "w", encoding="utf-8") as f:
             json.dump(summary, f, indent=2)
             
-        self.logger.info(f"Advanced metadata summary synchronized safely. Version: {summary['environment_telemetry']['engine_version']}")
+        self.logger.info(f"Metadata telemetry tracking records successfully flushed to storage profile block")
         return summary
