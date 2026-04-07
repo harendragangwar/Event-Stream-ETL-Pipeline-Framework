@@ -19,6 +19,12 @@ class TestMetadata(unittest.TestCase):
         res = self.tracker.generate_run_summary("run_20260401", 100, 95, meta_dir=self.test_meta_dir)
         self.assertTrue(res["compliance_checks"]["anonymization_applied"])
         self.assertEqual(res["compliance_checks"]["schema_version"], "v2.1")
-        self.assertEqual(res["environment_telemetry"]["engine_version"], "1.4.5")
+        self.assertEqual(res["environment_telemetry"]["engine_version"], "1.5.2")
+
+    def test_resource_profiling_metadata(self):
+        res = self.tracker.generate_run_summary("run_resource_test", 50, 45, meta_dir=self.test_meta_dir)
+        self.assertIn("resource_profiling", res)
+        self.assertEqual(res["resource_profiling"]["allocated_nodes"], 1)
+        self.assertEqual(res["resource_profiling"]["orchestration_layer"], "native_core")
 if __name__ == '__main__':
     unittest.main()
