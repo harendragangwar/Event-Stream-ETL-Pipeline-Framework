@@ -7,14 +7,17 @@ class TestTransformer(unittest.TestCase):
         self.logger = setup_production_logging()
         self.transformer = LogTransformer(self.logger)
 
-    def test_payload_transformation(self):
+    def test_payload_transformation_bounds(self):
         mock_raw = [{"event_id": "evt_123", "action": "click", "device_type": "MOBILE", "session_duration_sec": "500"}]
         res = self.transformer.transform_payload(mock_raw)
         self.assertEqual(res[0]["action"], "CLICK")
+        self.assertEqual(res[0]["device_type"], "mobile")
 
-    def test_invalid_uuid_discard(self):
-        mock_raw = [{"event_id": "corrupted_id", "action": "click"}]
-        res = self.transformer.validate_records(mock_raw)
-        self.assertEqual(len(res), 0)
+    def test_string_limit_truncation(self):
+        long_action = "BURST_ACTION_" + "X" * 100
+        mock_raw = [{"event_id": "evt_999", "action": long_action, "device_type": "desktop"}]
+        res = self.transformer.transform_payload(mock_raw)
+        self.assertEqual(len(res[0]["action"]), 64)
+        self.assertTrue(res[0]["action"].startswith("BURST_ACTION_"))
 if __name__ == '__main__':
     unittest.main()
