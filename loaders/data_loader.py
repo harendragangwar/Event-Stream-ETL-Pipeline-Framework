@@ -22,6 +22,10 @@ class DiskDataLoader:
             os.makedirs(proc_dir)
         file_path = f"{proc_dir}/clean_events_{execution_id}.json"
         try:
+            import shutil
+            total, used, free = shutil.disk_usage(proc_dir)
+            if (used / total) * 100 > self.config.get("cleanup_threshold", 90.0):
+                self.logger.warning("Stage destination volume space exceeding utilization threshold boundaries")
             with open(file_path, "w") as f:
                 json.dump(data, f, indent=2)
         except IOError as e:
