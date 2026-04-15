@@ -61,9 +61,15 @@ class DatabaseManager:
         try:
             with sqlite3.connect(self.db_path, timeout=30.0) as conn:
                 cursor = conn.cursor()
-                cursor.execute('SELECT action, COUNT(*), AVG(session_duration_sec) FROM ecommerce_events GROUP BY action')
+                cursor.execute('SELECT action, COUNT(*), AVG(session_duration_sec), SUM(session_duration_sec) FROM ecommerce_events GROUP BY action')
                 metrics = cursor.fetchall()
-                action_summary = {action: {"count": count, "avg_duration": round(avg_dur, 2)} for action, count, avg_dur in metrics}
+                action_summary = {
+                    action: {
+                        "count": count, 
+                        "avg_duration": round(avg_dur, 2),
+                        "total_volume_sec": total_sec
+                    } for action, count, avg_dur, total_sec in metrics
+                }
                 
                 cursor.execute('SELECT device_type, COUNT(*) FROM ecommerce_events GROUP BY device_type')
                 device_metrics = cursor.fetchall()
@@ -75,9 +81,10 @@ class DatabaseManager:
                 compiled_metrics = {
                     "actions": action_summary,
                     "devices": device_summary,
-                    "unique_users_count": unique_users
+                    "unique_users_count": unique_users,
+                    "generated_at": os.path.getmtime(self.db_path) if os.path.exists(self.db_path) else 0.0
                 }
-                self.logger.info(f"Warehouse advanced metrics compiled with user metrics: {str(compiled_metrics)}")
+                self.logger.info(f"Warehouse analytics summary execution matrix updated: {str(compiled_metrics)}")
                 return compiled_metrics
         except Exception as e:
             self.logger.error(f"Failed to query database metric states: {str(e)}")
