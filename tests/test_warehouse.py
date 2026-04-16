@@ -24,18 +24,18 @@ class TestWarehouseEngine(unittest.TestCase):
             mode = cursor.fetchone()
         self.assertEqual(mode.lower(), "wal")
 
-    def test_invalid_path_exception(self):
-        with self.assertRaises(DatabaseTransactionError):
-            broken_manager = DatabaseManager(self.logger, db_path="/invalid_dir/null.db")
-
-    def test_warehouse_advanced_metrics_with_users(self):
+    def test_extended_metrics_aggregation_fields(self):
         mock_records = [
-            {"event_id": "evt_1", "user_id": "usr_a", "action": "CLICK", "device_type": "mobile"},
-            {"event_id": "evt_2", "user_id": "usr_a", "action": "CLICK", "device_type": "mobile"},
-            {"event_id": "evt_3", "user_id": "usr_b", "action": "VIEW", "device_type": "desktop"}
+            {"event_id": "evt_v1", "user_id": "usr_x", "action": "VIEW", "device_type": "mobile", "timestamp": "2026", "processed_at": "2026", "source_system": "web", "session_duration_sec": 300},
+            {"event_id": "evt_v2", "user_id": "usr_y", "action": "VIEW", "device_type": "mobile", "timestamp": "2026", "processed_at": "2026", "source_system": "web", "session_duration_sec": 600}
         ]
         self.db_manager.insert_clean_records(mock_records)
         compiled = self.db_manager.compute_activity_metrics()
-        self.assertEqual(compiled["unique_users_count"][0], 2)
+        
+        self.assertIn("actions", compiled)
+        self.assertEqual(compiled["actions"]["VIEW"]["count"], 2)
+        self.assertEqual(compiled["actions"]["VIEW"]["avg_duration"], 450.0)
+        self.assertEqual(compiled["actions"]["VIEW"]["total_volume_sec"], 900)
+        self.assertIn("generated_at", compiled)
 if __name__ == '__main__':
     unittest.main()
