@@ -26,13 +26,14 @@ class DatabaseManager:
                         timestamp TEXT,
                         processed_at TEXT,
                         source_system TEXT,
-                        session_duration_sec INTEGER
+                        session_duration_sec INTEGER,
+                        partition_key TEXT
                     )
                 ''')
                 conn.commit()
         except Exception as e:
             raise DatabaseTransactionError(f"Warehouse setup crash: {str(e)}")
-        self.logger.info("Storage warehouse optimization completed with WAL pooling configurations")
+        self.logger.info("Storage warehouse optimization completed with partition index layout maps")
 
     def insert_clean_records(self, record_list):
         if not record_list:
@@ -44,18 +45,19 @@ class DatabaseManager:
                 for rec in record_list:
                     cursor.execute('''
                         INSERT OR REPLACE INTO ecommerce_events 
-                        (event_id, user_id, action, device_type, timestamp, processed_at, source_system, session_duration_sec)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        (event_id, user_id, action, device_type, timestamp, processed_at, source_system, session_duration_sec, partition_key)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ''', (
                         rec.get("event_id"), rec.get("user_id"), rec.get("action"),
                         rec.get("device_type"), rec.get("timestamp"), rec.get("processed_at"),
-                        rec.get("source_system"), rec.get("session_duration_sec", 0)
+                        rec.get("source_system"), rec.get("session_duration_sec", 0),
+                        rec.get("partition_key", "thread_1")
                     ))
                     inserted_count += 1
                 conn.commit()
         except Exception as e:
             raise DatabaseTransactionError(f"Database write failure execution aborted: {str(e)}")
-        self.logger.info(f"Database sink transaction completed. Synced {inserted_count} table records")
+        self.logger.info(f"Database sink transaction completed. Synced {inserted_count} partition matrix records")
 
     def compute_activity_metrics(self):
         try:
@@ -76,7 +78,7 @@ class DatabaseManager:
                 device_summary = {device: count for device, count in device_metrics}
                 
                 cursor.execute('SELECT COUNT(DISTINCT user_id) FROM ecommerce_events')
-                unique_users = cursor.fetchone()[0]
+                unique_users = cursor.fetchone()
                 
                 compiled_metrics = {
                     "actions": action_summary,
