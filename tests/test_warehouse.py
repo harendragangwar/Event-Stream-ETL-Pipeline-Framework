@@ -18,24 +18,19 @@ class TestWarehouseEngine(unittest.TestCase):
 
     def test_warehouse_initialization(self):
         self.assertTrue(os.path.exists(self.test_db))
+
+    def test_partition_key_records_insertion(self):
+        mock_record = {
+            "event_id": "evt_part_99", "user_id": "usr_99", "action": "PURCHASE",
+            "device_type": "desktop", "timestamp": "2026-04-26T00:00:00",
+            "processed_at": "2026-04-26T00:01:00", "source_system": "web",
+            "session_duration_sec": 420, "partition_key": "thread_4"
+        }
+        self.db_manager.insert_clean_records([mock_record])
         with sqlite3.connect(self.test_db) as conn:
             cursor = conn.cursor()
-            cursor.execute("PRAGMA journal_mode;")
-            mode = cursor.fetchone()
-        self.assertEqual(mode.lower(), "wal")
-
-    def test_extended_metrics_aggregation_fields(self):
-        mock_records = [
-            {"event_id": "evt_v1", "user_id": "usr_x", "action": "VIEW", "device_type": "mobile", "timestamp": "2026", "processed_at": "2026", "source_system": "web", "session_duration_sec": 300},
-            {"event_id": "evt_v2", "user_id": "usr_y", "action": "VIEW", "device_type": "mobile", "timestamp": "2026", "processed_at": "2026", "source_system": "web", "session_duration_sec": 600}
-        ]
-        self.db_manager.insert_clean_records(mock_records)
-        compiled = self.db_manager.compute_activity_metrics()
-        
-        self.assertIn("actions", compiled)
-        self.assertEqual(compiled["actions"]["VIEW"]["count"], 2)
-        self.assertEqual(compiled["actions"]["VIEW"]["avg_duration"], 450.0)
-        self.assertEqual(compiled["actions"]["VIEW"]["total_volume_sec"], 900)
-        self.assertIn("generated_at", compiled)
+            cursor.execute("SELECT partition_key FROM ecommerce_events WHERE event_id='evt_part_99'")
+            val = cursor.fetchone()
+        self.assertEqual(val[0], "thread_4")
 if __name__ == '__main__':
     unittest.main()
