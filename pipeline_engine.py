@@ -13,7 +13,7 @@ from database.warehouse_engine import DatabaseManager
 
 class DataPipelineCore:
     def __init__(self):
-        self.version = "1.5.1"
+        self.version = "1.5.5"
         self.execution_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.status = "INITIALIZED"
         self.logger = setup_production_logging()
@@ -24,13 +24,13 @@ class DataPipelineCore:
         self.meta_tracker = PipelineMetadataTracker(self.logger)
         self.monitor = PipelineSystemMonitor(self.logger)
         self.db_manager = DatabaseManager(self.logger, db_path=self.config["warehouse_db_path"])
-        self.logger.info(f"Pipeline mapping layout core active session setup v{self.version}")
+        self.logger.info(f"Pipeline orchestration engine setup successfully v{self.version}")
 
     def _load_config(self):
         self.config = get_pipeline_settings()
 
     def run_pipeline(self):
-        self.logger.info("Executing active data warehouse framework checkpoints")
+        self.logger.info("Executing active partitioned data warehouse framework checkpoints")
         self.status = "RUNNING"
         try:
             self.monitor.collect_memory_usage()
@@ -50,7 +50,7 @@ class DataPipelineCore:
             self.status = "COMPLETED"
         except Exception as e:
             self.status = "FAILED"
-            self.logger.error(f"Warehouse pipeline lifecycle broken: {str(e)}")
+            self.logger.error(f"Warehouse partition loop pipeline lifecycle broken: {str(e)}")
             return False
         finally:
             self.monitor.collect_memory_usage()
