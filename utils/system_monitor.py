@@ -10,7 +10,8 @@ class PipelineSystemMonitor:
             import psutil
             process = psutil.Process(os.getpid())
             mem_mb = process.memory_info().rss / (1024 * 1024)
-            self.logger.info(f"System memory tracking verification metric: {mem_mb:.2f} MB")
+            virt_mem_mb = process.memory_info().vms / (1024 * 1024)
+            self.logger.info(f"System physical footprint: {mem_mb:.2f} MB | Virtual allocation block: {virt_mem_mb:.2f} MB")
             return mem_mb
         except Exception:
             self.logger.warning("Native process telemetry profiling metrics missing or offline")
