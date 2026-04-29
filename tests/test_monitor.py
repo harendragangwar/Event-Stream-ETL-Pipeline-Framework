@@ -15,5 +15,8 @@ class TestSystemMonitor(unittest.TestCase):
         free_gb = self.monitor.check_disk_space()
         self.assertIsInstance(free_gb, float)
         self.assertTrue(free_gb >= 0.0)
-if __name__ == '__main__':
-    unittest.main()
+
+    def test_system_memory_types(self):
+        import os
+        res = self.monitor.collect_memory_usage()
+        self.assertIsNotNone(res)
