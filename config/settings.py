@@ -38,5 +38,6 @@ def get_pipeline_settings():
         "enable_compression": selected_profile["enable_compression"],
         "cleanup_threshold": selected_profile["cleanup_threshold_pct"],
         "max_threads": selected_profile["max_network_threads"],
-        "warehouse_db_path": "data/pipeline_warehouse.db"
+        "warehouse_db_path": "data/pipeline_warehouse.db",
+        "warehouse_schema_version": "v1.5.0"
     }
