@@ -19,3 +19,9 @@ class DataSanitizer:
     def enforce_string_limits(text, max_len=64):
         cleaned = DataSanitizer.clean_alphanumeric(text)
         return cleaned[:max_len]
+
+    @staticmethod
+    def strip_sql_injection_chars(text):
+        if not text:
+            return ""
+        return re.sub(r"['\";\-]", "", str(text))
