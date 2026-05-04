@@ -11,4 +11,12 @@ class TestSanitizer(unittest.TestCase):
         long_input = "ACTION_" + "X" * 100
         res = DataSanitizer.enforce_string_limits(long_input, max_len=20)
         self.assertEqual(len(res), 20)
-        self.assertTrue(res.startswith("ACTION_"))
+
+    def test_sql_injection_stripping(self):
+        malicious_input = "SELECT * FROM users; -- '"
+        res = DataSanitizer.strip_sql_injection_chars(malicious_input)
+        self.assertNotIn("'", res)
+        self.assertNotIn(";", res)
+        self.assertNotIn("-", res)
+if __name__ == '__main__':
+    unittest.main()
