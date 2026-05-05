@@ -25,7 +25,8 @@ class LogTransformer:
         transformed = []
         for record in data:
             payload = record.copy()
-            payload["action"] = DataSanitizer.enforce_string_limits(str(payload["action"]).upper(), max_len=64)
+            safe_action = DataSanitizer.strip_sql_injection_chars(str(payload["action"]))
+            payload["action"] = DataSanitizer.enforce_string_limits(safe_action.upper(), max_len=64)
             payload["device_type"] = str(payload.get("device_type", "unknown")).lower()
             payload["session_duration_sec"] = int(payload.get("session_duration_sec", 0))
             payload["processed_at"] = datetime.now().isoformat()
