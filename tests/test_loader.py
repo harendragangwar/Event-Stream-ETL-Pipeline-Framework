@@ -20,5 +20,9 @@ class TestLoader(unittest.TestCase):
     def test_sync_verification_fallback(self):
         res = self.loader.verify_load_sync("non_existent_id_2026")
         self.assertFalse(res)
+        
+    def test_loader_config_keys(self):
+        self.assertIn("raw_stage_path", self.loader.config)
+        self.assertIn("processed_stage_path", self.loader.config)
 if __name__ == '__main__':
     unittest.main()
