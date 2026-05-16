@@ -16,5 +16,11 @@ class TestExtractor(unittest.TestCase):
         for record in data:
             self.assertIn("extraction_thread_id", record)
             self.assertTrue(1 <= record["extraction_thread_id"] <= 4)
+
+    def test_extraction_attempt_tag(self):
+        data = self.extractor.extract_raw_logs(batch_size=2)
+        for record in data:
+            self.assertIn("extraction_attempt", record)
+            self.assertEqual(record["extraction_attempt"], 1)
 if __name__ == '__main__':
     unittest.main()
