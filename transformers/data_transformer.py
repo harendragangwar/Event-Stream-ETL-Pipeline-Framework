@@ -32,5 +32,6 @@ class LogTransformer:
             payload["processed_at"] = datetime.now().isoformat()
             payload["source_system"] = "web_store_front"
             payload["partition_key"] = f"thread_{payload.get('extraction_thread_id', 1)}"
+            payload["attempt_index"] = int(payload.get("extraction_attempt", 1))
             transformed.append(payload)
         return transformed
