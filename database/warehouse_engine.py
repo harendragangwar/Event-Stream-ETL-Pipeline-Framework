@@ -27,13 +27,14 @@ class DatabaseManager:
                         processed_at TEXT,
                         source_system TEXT,
                         session_duration_sec INTEGER,
-                        partition_key TEXT
+                        partition_key TEXT,
+                        attempt_index INTEGER
                     )
                 ''')
                 conn.commit()
         except Exception as e:
             raise DatabaseTransactionError(f"Warehouse setup crash: {str(e)}")
-        self.logger.info("Storage warehouse optimization completed with partition index layout maps")
+        self.logger.info("Storage warehouse optimization completed with full metric field index maps")
 
     def insert_clean_records(self, record_list):
         if not record_list:
@@ -45,19 +46,19 @@ class DatabaseManager:
                 for rec in record_list:
                     cursor.execute('''
                         INSERT OR REPLACE INTO ecommerce_events 
-                        (event_id, user_id, action, device_type, timestamp, processed_at, source_system, session_duration_sec, partition_key)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        (event_id, user_id, action, device_type, timestamp, processed_at, source_system, session_duration_sec, partition_key, attempt_index)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ''', (
                         rec.get("event_id"), rec.get("user_id"), rec.get("action"),
                         rec.get("device_type"), rec.get("timestamp"), rec.get("processed_at"),
                         rec.get("source_system"), rec.get("session_duration_sec", 0),
-                        rec.get("partition_key", "thread_1")
+                        rec.get("partition_key", "thread_1"), rec.get("attempt_index", 1)
                     ))
                     inserted_count += 1
                 conn.commit()
         except Exception as e:
             raise DatabaseTransactionError(f"Database write failure execution aborted: {str(e)}")
-        self.logger.info(f"Database sink transaction completed. Synced {inserted_count} partition matrix records")
+        self.logger.info(f"Database sink transaction completed. Synced {inserted_count} cluster tracking records")
 
     def compute_activity_metrics(self):
         try:
@@ -83,7 +84,7 @@ class DatabaseManager:
                 compiled_metrics = {
                     "actions": action_summary,
                     "devices": device_summary,
-                    "unique_users_count": unique_users[0] if unique_users else 0,
+                    "unique_users_count": unique_users if unique_users else 0,
                     "generated_at": os.path.getmtime(self.db_path) if os.path.exists(self.db_path) else 0.0,
                     "verification_status": "INTEGRITY_CHECK_PASS"
                 }
