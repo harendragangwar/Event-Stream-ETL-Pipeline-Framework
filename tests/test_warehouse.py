@@ -19,19 +19,19 @@ class TestWarehouseEngine(unittest.TestCase):
     def test_warehouse_initialization(self):
         self.assertTrue(os.path.exists(self.test_db))
 
-    def test_partition_key_records_insertion(self):
+    def test_attempt_index_column_schema(self):
         mock_record = {
-            "event_id": "evt_part_99", "user_id": "usr_99", "action": "PURCHASE",
-            "device_type": "desktop", "timestamp": "2026-05-10T00:00:00",
-            "processed_at": "2026-05-10T00:01:00", "source_system": "web",
-            "session_duration_sec": 420, "partition_key": "thread_4"
+            "event_id": "evt_att_12", "user_id": "usr_12", "action": "CART_ADD",
+            "device_type": "mobile", "timestamp": "2026-05-20T00:00:00",
+            "processed_at": "2026-05-20T00:01:00", "source_system": "web",
+            "session_duration_sec": 120, "partition_key": "thread_2", "attempt_index": 3
         }
         self.db_manager.insert_clean_records([mock_record])
         with sqlite3.connect(self.test_db) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT partition_key FROM ecommerce_events WHERE event_id='evt_part_99'")
+            cursor.execute("SELECT attempt_index FROM ecommerce_events WHERE event_id='evt_att_12'")
             val = cursor.fetchone()
-        self.assertEqual(val[0], "thread_4")
+        self.assertEqual(val[0], 3)
 
     def test_integrity_check_verification_marker(self):
         mock_record = {
