@@ -9,9 +9,16 @@ class PipelineSystemMonitor:
         try:
             import psutil
             process = psutil.Process(os.getpid())
-            mem_mb = process.memory_info().rss / (1024 * 1024)
-            virt_mem_mb = process.memory_info().vms / (1024 * 1024)
-            self.logger.info(f"System physical footprint: {mem_mb:.2f} MB | Virtual allocation block: {virt_mem_mb:.2f} MB")
+            mem_info = process.memory_info()
+            mem_mb = mem_info.rss / (1024 * 1024)
+            virt_mem_mb = mem_info.vms / (1024 * 1024)
+            shared_mem_mb = getattr(mem_info, 'shared', 0) / (1024 * 1024)
+            
+            self.logger.info(
+                f"System physical footprint: {mem_mb:.2f} MB | "
+                f"Virtual allocation: {virt_mem_mb:.2f} MB | "
+                f"Shared segment: {shared_mem_mb:.2f} MB"
+            )
             return mem_mb
         except Exception:
             self.logger.warning("Native process telemetry profiling metrics missing or offline")
