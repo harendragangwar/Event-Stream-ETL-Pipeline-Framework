@@ -16,7 +16,9 @@ class TestSystemMonitor(unittest.TestCase):
         self.assertIsInstance(free_gb, float)
         self.assertTrue(free_gb >= 0.0)
 
-    def test_system_memory_types(self):
-        import os
+    def test_extended_shared_memory_telemetry(self):
         res = self.monitor.collect_memory_usage()
         self.assertIsNotNone(res)
+        self.assertTrue(isinstance(res, float) or isinstance(res, int))
+if __name__ == '__main__':
+    unittest.main()
