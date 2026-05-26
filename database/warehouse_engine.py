@@ -3,9 +3,10 @@ import os
 from utils.exceptions import DatabaseTransactionError
 
 class DatabaseManager:
-    def __init__(self, logger, db_path="data/pipeline_warehouse.db"):
+    def __init__(self, logger, db_path="data/pipeline_warehouse.db", isolation_level="DEFERRED"):
         self.logger = logger
         self.db_path = db_path
+        self.isolation_level = isolation_level
         self._initialize_warehouse()
 
     def _initialize_warehouse(self):
@@ -13,7 +14,7 @@ class DatabaseManager:
         if db_dir and not os.path.exists(db_dir):
             os.makedirs(db_dir)
         try:
-            with sqlite3.connect(self.db_path, timeout=30.0) as conn:
+            with sqlite3.connect(self.db_path, timeout=30.0, isolation_level=self.isolation_level) as conn:
                 cursor = conn.cursor()
                 cursor.execute("PRAGMA journal_mode=WAL;")
                 cursor.execute("PRAGMA synchronous=NORMAL;")
@@ -34,14 +35,14 @@ class DatabaseManager:
                 conn.commit()
         except Exception as e:
             raise DatabaseTransactionError(f"Warehouse setup crash: {str(e)}")
-        self.logger.info("Storage warehouse optimization completed with full metric field index maps")
+        self.logger.info(f"Storage warehouse optimization completed under {self.isolation_level} isolation pooling mode")
 
     def insert_clean_records(self, record_list):
         if not record_list:
             return
         inserted_count = 0
         try:
-            with sqlite3.connect(self.db_path, timeout=30.0) as conn:
+            with sqlite3.connect(self.db_path, timeout=30.0, isolation_level=self.isolation_level) as conn:
                 cursor = conn.cursor()
                 for rec in record_list:
                     cursor.execute('''
@@ -58,11 +59,11 @@ class DatabaseManager:
                 conn.commit()
         except Exception as e:
             raise DatabaseTransactionError(f"Database write failure execution aborted: {str(e)}")
-        self.logger.info(f"Database sink transaction completed. Synced {inserted_count} cluster tracking records")
+        self.logger.info(f"Database sink transaction completed. Synced {inserted_count} partition records")
 
     def compute_activity_metrics(self):
         try:
-            with sqlite3.connect(self.db_path, timeout=30.0) as conn:
+            with sqlite3.connect(self.db_path, timeout=30.0, isolation_level=self.isolation_level) as conn:
                 cursor = conn.cursor()
                 cursor.execute('SELECT action, COUNT(*), AVG(session_duration_sec), SUM(session_duration_sec) FROM ecommerce_events GROUP BY action')
                 metrics = cursor.fetchall()
@@ -88,7 +89,7 @@ class DatabaseManager:
                     "generated_at": os.path.getmtime(self.db_path) if os.path.exists(self.db_path) else 0.0,
                     "verification_status": "INTEGRITY_CHECK_PASS"
                 }
-                self.logger.info(f"Warehouse analytics summary execution matrix updated: {str(compiled_metrics)}")
+                self.logger.info(f"Warehouse analytics mapping compiled safely: {str(compiled_metrics)}")
                 return compiled_metrics
         except Exception as e:
             self.logger.error(f"Failed to query database metric states: {str(e)}")
