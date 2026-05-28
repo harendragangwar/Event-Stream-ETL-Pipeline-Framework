@@ -13,7 +13,7 @@ from database.warehouse_engine import DatabaseManager
 
 class DataPipelineCore:
     def __init__(self):
-        self.version = "1.6.0"
+        self.version = "1.6.2"
         self.execution_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.status = "INITIALIZED"
         self.logger = setup_production_logging()
@@ -23,8 +23,12 @@ class DataPipelineCore:
         self.loader = DiskDataLoader(self.logger, self.config)
         self.meta_tracker = PipelineMetadataTracker(self.logger)
         self.monitor = PipelineSystemMonitor(self.logger)
-        self.db_manager = DatabaseManager(self.logger, db_path=self.config["warehouse_db_path"])
-        self.logger.info(f"Pipeline running version {self.version} execution tracking cluster initialized")
+        self.db_manager = DatabaseManager(
+            self.logger, 
+            db_path=self.config["warehouse_db_path"],
+            isolation_level=self.config.get("transaction_isolation_level", "DEFERRED")
+        )
+        self.logger.info(f"Pipeline running version {self.version} storage connection properties locked cleanly")
 
     def _load_config(self):
         self.config = get_pipeline_settings()
