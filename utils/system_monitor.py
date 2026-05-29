@@ -13,11 +13,13 @@ class PipelineSystemMonitor:
             mem_mb = mem_info.rss / (1024 * 1024)
             virt_mem_mb = mem_info.vms / (1024 * 1024)
             shared_mem_mb = getattr(mem_info, 'shared', 0) / (1024 * 1024)
+            cpu_usage_pct = process.cpu_percent(interval=None)
             
             self.logger.info(
                 f"System physical footprint: {mem_mb:.2f} MB | "
                 f"Virtual allocation: {virt_mem_mb:.2f} MB | "
-                f"Shared segment: {shared_mem_mb:.2f} MB"
+                f"Shared segment: {shared_mem_mb:.2f} MB | "
+                f"Core CPU usage: {cpu_usage_pct:.1f}%"
             )
             return mem_mb
         except Exception:
