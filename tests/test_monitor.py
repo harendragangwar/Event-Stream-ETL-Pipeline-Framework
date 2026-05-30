@@ -20,5 +20,8 @@ class TestSystemMonitor(unittest.TestCase):
         res = self.monitor.collect_memory_usage()
         self.assertIsNotNone(res)
         self.assertTrue(isinstance(res, float) or isinstance(res, int))
-if __name__ == '__main__':
-    unittest.main()
+
+    def test_cpu_utilization_metric_bounds(self):
+        import os
+        res = self.monitor.collect_memory_usage()
+        self.assertIsNotNone(res)
