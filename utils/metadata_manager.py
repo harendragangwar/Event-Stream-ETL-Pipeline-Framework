@@ -20,7 +20,7 @@ class PipelineMetadataTracker:
                 "pipeline_efficiency_pct": efficiency_rate
             },
             "environment_telemetry": {
-                "engine_version": "1.6.0",
+                "engine_version": "1.6.5",
                 "system_status": "HEALTHY" if dropped / (total if total > 0 else 1) < 0.2 else "DEGRADED"
             },
             "compliance_checks": {
@@ -31,7 +31,8 @@ class PipelineMetadataTracker:
             "resource_profiling": {
                 "allocated_nodes": 1,
                 "orchestration_layer": "native_core",
-                "execution_profile": "steady_state_batch"
+                "execution_profile": "steady_state_batch",
+                "telemetry_sync_status": "SYNCHRONIZED"
             }
         }
         
@@ -42,5 +43,5 @@ class PipelineMetadataTracker:
         with open(target_path, "w", encoding="utf-8") as f:
             json.dump(summary, f, indent=2)
             
-        self.logger.info(f"Advanced metadata schema version {summary['compliance_checks']['schema_version']} flushed securely to repository sink")
+        self.logger.info(f"Advanced metadata execution matrix compiled successfully. Engine: v{summary['environment_telemetry']['engine_version']}")
         return summary
