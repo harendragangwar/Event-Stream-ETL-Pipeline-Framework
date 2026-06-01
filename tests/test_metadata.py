@@ -16,14 +16,15 @@ class TestMetadata(unittest.TestCase):
             except: pass
 
     def test_compliance_matrix_generation_v25(self):
-        res = self.tracker.generate_run_summary("run_20260512", 100, 95, meta_dir=self.test_meta_dir)
+        res = self.tracker.generate_run_summary("run_20260601", 100, 95, meta_dir=self.test_meta_dir)
         self.assertTrue(res["compliance_checks"]["anonymization_applied"])
         self.assertEqual(res["compliance_checks"]["schema_version"], "v2.5")
-        self.assertEqual(res["compliance_checks"]["encryption_protocol"], "aes_256_gcm")
+        self.assertEqual(res["environment_telemetry"]["engine_version"], "1.6.5")
 
-    def test_execution_profile_telemetry(self):
-        res = self.tracker.generate_run_summary("run_profile_assert", 60, 58, meta_dir=self.test_meta_dir)
+    def test_sync_status_telemetry(self):
+        res = self.tracker.generate_run_summary("run_sync_assert", 80, 78, meta_dir=self.test_meta_dir)
         self.assertIn("resource_profiling", res)
+        self.assertEqual(res["resource_profiling"]["telemetry_sync_status"], "SYNCHRONIZED")
         self.assertEqual(res["resource_profiling"]["execution_profile"], "steady_state_batch")
 if __name__ == '__main__':
     unittest.main()
