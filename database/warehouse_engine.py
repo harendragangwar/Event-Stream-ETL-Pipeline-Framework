@@ -59,7 +59,7 @@ class DatabaseManager:
                 conn.commit()
         except Exception as e:
             raise DatabaseTransactionError(f"Database write failure execution aborted: {str(e)}")
-        self.logger.info(f"Database sink transaction completed. Synced {inserted_count} partition records")
+        self.logger.info(f"Database sink transaction completed. Synced {inserted_count} partition records | State: SUCCESS")
 
     def compute_activity_metrics(self):
         try:
