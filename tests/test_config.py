@@ -8,14 +8,14 @@ class TestPipelineConfig(unittest.TestCase):
             del os.environ["PIPELINE_ENV"]
         settings = get_pipeline_settings()
         self.assertEqual(settings["batch_size"], 1000)
-        self.assertEqual(settings["transaction_isolation_level"], "DEFERRED")
+        self.assertEqual(settings["memory_buffer_limit_mb"], 128.0)
         self.assertFalse(settings["is_production"])
 
     def test_config_structure_production_profile(self):
         os.environ["PIPELINE_ENV"] = "prod"
         settings = get_pipeline_settings()
         self.assertEqual(settings["batch_size"], 5000)
-        self.assertEqual(settings["transaction_isolation_level"], "EXCLUSIVE")
+        self.assertEqual(settings["memory_buffer_limit_mb"], 512.0)
         self.assertTrue(settings["is_production"])
         del os.environ["PIPELINE_ENV"]
 if __name__ == '__main__':
