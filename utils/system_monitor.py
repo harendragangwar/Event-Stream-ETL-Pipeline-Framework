@@ -26,6 +26,13 @@ class PipelineSystemMonitor:
             self.logger.warning("Native process telemetry profiling metrics missing or offline")
             return 0.0
 
+    def enforce_buffer_limits_check(self, current_allocated_mb, max_limit_mb=128.0):
+        if current_allocated_mb > max_limit_mb:
+            self.logger.warning(f"Telemetry heap tracking limits exceeded: {current_allocated_mb:.2f}MB breached threshold bounds: {max_limit_mb:.2f}MB")
+            return False
+        self.logger.info(f"System memory tracking diagnostics verified safely inside threshold buffer boundaries")
+        return True
+
     def check_disk_space(self, target_path="."):
         try:
             import shutil
