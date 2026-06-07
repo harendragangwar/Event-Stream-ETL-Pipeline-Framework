@@ -16,12 +16,12 @@ class TestSystemMonitor(unittest.TestCase):
         self.assertIsInstance(free_gb, float)
         self.assertTrue(free_gb >= 0.0)
 
-    def test_extended_shared_memory_telemetry(self):
-        res = self.monitor.collect_memory_usage()
-        self.assertIsNotNone(res)
-        self.assertTrue(isinstance(res, float) or isinstance(res, int))
+    def test_enforce_buffer_limits_valid(self):
+        res = self.monitor.enforce_buffer_limits_check(50.0, max_limit_mb=128.0)
+        self.assertTrue(res)
 
-    def test_cpu_utilization_metric_bounds(self):
-        import os
-        res = self.monitor.collect_memory_usage()
-        self.assertIsNotNone(res)
+    def test_enforce_buffer_limits_breached(self):
+        res = self.monitor.enforce_buffer_limits_check(200.0, max_limit_mb=128.0)
+        self.assertFalse(res)
+if __name__ == '__main__':
+    unittest.main()
