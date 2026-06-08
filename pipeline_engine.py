@@ -13,7 +13,7 @@ from database.warehouse_engine import DatabaseManager
 
 class DataPipelineCore:
     def __init__(self):
-        self.version = "1.6.2"
+        self.version = "1.6.6"
         self.execution_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.status = "INITIALIZED"
         self.logger = setup_production_logging()
@@ -28,7 +28,7 @@ class DataPipelineCore:
             db_path=self.config["warehouse_db_path"],
             isolation_level=self.config.get("transaction_isolation_level", "DEFERRED")
         )
-        self.logger.info(f"Pipeline running version {self.version} storage connection properties locked cleanly")
+        self.logger.info(f"Pipeline running version {self.version} execution tracking cluster active")
 
     def _load_config(self):
         self.config = get_pipeline_settings()
@@ -37,8 +37,10 @@ class DataPipelineCore:
         self.logger.info("Executing active partitioned data warehouse framework checkpoints")
         self.status = "RUNNING"
         try:
-            self.monitor.collect_memory_usage()
+            current_rss = self.monitor.collect_memory_usage()
+            self.monitor.enforce_buffer_limits_check(current_rss, max_limit_mb=self.config.get("memory_buffer_limit_mb", 128.0))
             self.monitor.check_disk_space()
+            
             target_batch = min(self.config.get("batch_size", 1000), 100)
             raw_data = self.extractor.extract_raw_logs(batch_size=target_batch)
             if len(raw_data) < 1:
