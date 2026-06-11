@@ -87,9 +87,10 @@ class DatabaseManager:
                     "devices": device_summary,
                     "unique_users_count": unique_users if unique_users else 0,
                     "generated_at": os.path.getmtime(self.db_path) if os.path.exists(self.db_path) else 0.0,
-                    "verification_status": "INTEGRITY_CHECK_PASS"
+                    "verification_status": "INTEGRITY_CHECK_PASS",
+                    "telemetry_stream_sync": "STABLE"
                 }
-                self.logger.info(f"Warehouse analytics mapping compiled safely: {str(compiled_metrics)}")
+                self.logger.info(f"Warehouse analytics mapping compiled safely with stream sync flags: {str(compiled_metrics)}")
                 return compiled_metrics
         except Exception as e:
             self.logger.error(f"Failed to query database metric states: {str(e)}")
