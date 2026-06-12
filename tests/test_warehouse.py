@@ -22,15 +22,15 @@ class TestWarehouseEngine(unittest.TestCase):
     def test_isolation_level_property(self):
         self.assertEqual(self.db_manager.isolation_level, "DEFERRED")
 
-    def test_transaction_sync_signatures(self):
+    def test_telemetry_stream_sync_flag(self):
         mock_record = {
-            "event_id": "evt_sync_101", "user_id": "usr_101", "action": "CLICK",
-            "device_type": "desktop", "timestamp": "2026-06-03T00:00:00",
-            "processed_at": "2026-06-03T00:01:00", "source_system": "web",
-            "session_duration_sec": 45, "partition_key": "thread_1", "attempt_index": 1
+            "event_id": "evt_stream_202", "user_id": "usr_202", "action": "VIEW",
+            "device_type": "mobile", "timestamp": "2026-06-12T00:00:00",
+            "processed_at": "2026-06-12T00:01:00", "source_system": "web"
         }
         self.db_manager.insert_clean_records([mock_record])
         compiled = self.db_manager.compute_activity_metrics()
-        self.assertEqual(compiled["verification_status"], "INTEGRITY_CHECK_PASS")
+        self.assertIn("telemetry_stream_sync", compiled)
+        self.assertEqual(compiled["telemetry_stream_sync"], "STABLE")
 if __name__ == '__main__':
     unittest.main()
