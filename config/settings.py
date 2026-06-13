@@ -13,7 +13,8 @@ def get_pipeline_settings():
             "max_network_threads": 4,
             "backup_retention_limit": 5,
             "isolation_level": "EXCLUSIVE",
-            "buffer_limit_mb": 512.0
+            "buffer_limit_mb": 512.0,
+            "compression_size_kb": 1024
         },
         "dev": {
             "batch_size": 1000,
@@ -25,7 +26,8 @@ def get_pipeline_settings():
             "max_network_threads": 1,
             "backup_retention_limit": 2,
             "isolation_level": "DEFERRED",
-            "buffer_limit_mb": 128.0
+            "buffer_limit_mb": 128.0,
+            "compression_size_kb": 256
         }
     }
     
@@ -48,5 +50,6 @@ def get_pipeline_settings():
         "warehouse_schema_version": "v1.5.0",
         "backup_retention_limit": selected_profile["backup_retention_limit"],
         "transaction_isolation_level": selected_profile["isolation_level"],
-        "memory_buffer_limit_mb": selected_profile["buffer_limit_mb"]
+        "memory_buffer_limit_mb": selected_profile["buffer_limit_mb"],
+        "compression_block_size_kb": selected_profile["compression_size_kb"]
     }
