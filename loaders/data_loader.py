@@ -38,7 +38,8 @@ class DiskDataLoader:
         status = os.path.exists(target) and os.path.getsize(target) > 0
         if status:
             file_size_kb = os.path.getsize(target) / 1024
-            self.logger.info(f"Storage load verification clear. Node size: {file_size_kb:.2f} KB | Integrity: SECURE")
+            block_limit = self.config.get("compression_block_size_kb", 256)
+            self.logger.info(f"Storage load verification clear. Node size: {file_size_kb:.2f} KB | Target Block Window Limit: {block_limit} KB")
         else:
             self.logger.error(f"Downstream transaction check mismatch for execution node: {execution_id}")
         return status
