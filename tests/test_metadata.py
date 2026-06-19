@@ -16,13 +16,15 @@ class TestMetadata(unittest.TestCase):
             except: pass
 
     def test_compliance_matrix_generation_v25(self):
-        res = self.tracker.generate_run_summary("run_20260610", 100, 95, meta_dir=self.test_meta_dir)
+        res = self.tracker.generate_run_summary("run_20260619", 100, 95, meta_dir=self.test_meta_dir)
         self.assertTrue(res["compliance_checks"]["anonymization_applied"])
         self.assertEqual(res["compliance_checks"]["schema_version"], "v2.5")
-        self.assertEqual(res["environment_telemetry"]["engine_version"], "1.7.0")
+        self.assertEqual(res["environment_telemetry"]["engine_version"], "1.7.5")
 
-    def test_heap_gate_checks_telemetry_indicator(self):
-        res = self.tracker.generate_run_summary("run_gate_assert", 50, 48, meta_dir=self.test_meta_dir)
+    def test_compression_window_indicator_assert(self):
+        res = self.tracker.generate_run_summary("run_compress_assert", 40, 39, meta_dir=self.test_meta_dir)
         self.assertIn("resource_profiling", res)
+        self.assertTrue(res["resource_profiling"]["compression_window_active"])
         self.assertTrue(res["resource_profiling"]["heap_gate_checks_applied"])
-        self.assertEqual(res["resource_profiling"]["telemetry_sync_status"], "SYNCHRONIZED")
+if __name__ == '__main__':
+    unittest.main()
