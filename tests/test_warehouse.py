@@ -22,15 +22,16 @@ class TestWarehouseEngine(unittest.TestCase):
     def test_isolation_level_property(self):
         self.assertEqual(self.db_manager.isolation_level, "DEFERRED")
 
-    def test_telemetry_stream_sync_flag(self):
+    def test_compression_mapping_telemetry_fields(self):
         mock_record = {
-            "event_id": "evt_stream_202", "user_id": "usr_202", "action": "VIEW",
-            "device_type": "mobile", "timestamp": "2026-06-12T00:00:00",
-            "processed_at": "2026-06-12T00:01:00", "source_system": "web"
+            "event_id": "evt_comp_303", "user_id": "usr_303", "action": "PURCHASE",
+            "device_type": "mobile", "timestamp": "2026-06-21T00:00:00",
+            "processed_at": "2026-06-21T00:01:00", "source_system": "web"
         }
         self.db_manager.insert_clean_records([mock_record])
         compiled = self.db_manager.compute_activity_metrics()
-        self.assertIn("telemetry_stream_sync", compiled)
-        self.assertEqual(compiled["telemetry_stream_sync"], "STABLE")
+        self.assertIn("compression_mapping", compiled)
+        self.assertEqual(compiled["compression_mapping"], "OPTIMIZED")
+        self.assertEqual(compiled["verification_status"], "INTEGRITY_CHECK_PASS")
 if __name__ == '__main__':
     unittest.main()
