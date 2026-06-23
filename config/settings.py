@@ -14,7 +14,8 @@ def get_pipeline_settings():
             "backup_retention_limit": 5,
             "isolation_level": "EXCLUSIVE",
             "buffer_limit_mb": 512.0,
-            "compression_size_kb": 1024
+            "compression_size_kb": 1024,
+            "anomaly_threshold": 0.01
         },
         "dev": {
             "batch_size": 1000,
@@ -27,7 +28,8 @@ def get_pipeline_settings():
             "backup_retention_limit": 2,
             "isolation_level": "DEFERRED",
             "buffer_limit_mb": 128.0,
-            "compression_size_kb": 256
+            "compression_size_kb": 256,
+            "anomaly_threshold": 0.05
         }
     }
     
@@ -51,5 +53,6 @@ def get_pipeline_settings():
         "backup_retention_limit": selected_profile["backup_retention_limit"],
         "transaction_isolation_level": selected_profile["isolation_level"],
         "memory_buffer_limit_mb": selected_profile["buffer_limit_mb"],
-        "compression_block_size_kb": selected_profile["compression_size_kb"]
+        "compression_block_size_kb": selected_profile["compression_size_kb"],
+        "anomaly_detection_threshold": selected_profile["anomaly_threshold"]
     }
