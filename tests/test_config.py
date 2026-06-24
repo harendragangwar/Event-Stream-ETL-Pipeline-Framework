@@ -8,14 +8,14 @@ class TestPipelineConfig(unittest.TestCase):
             del os.environ["PIPELINE_ENV"]
         settings = get_pipeline_settings()
         self.assertEqual(settings["batch_size"], 1000)
-        self.assertEqual(settings["compression_block_size_kb"], 256)
+        self.assertEqual(settings["anomaly_detection_threshold"], 0.05)
         self.assertFalse(settings["is_production"])
 
     def test_config_structure_production_profile(self):
         os.environ["PIPELINE_ENV"] = "prod"
         settings = get_pipeline_settings()
         self.assertEqual(settings["batch_size"], 5000)
-        self.assertEqual(settings["compression_block_size_kb"], 1024)
+        self.assertEqual(settings["anomaly_detection_threshold"], 0.01)
         self.assertTrue(settings["is_production"])
         del os.environ["PIPELINE_ENV"]
 if __name__ == '__main__':
