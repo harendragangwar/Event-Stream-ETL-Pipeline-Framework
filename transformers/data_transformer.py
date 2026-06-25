@@ -33,5 +33,10 @@ class LogTransformer:
             payload["source_system"] = "web_store_front"
             payload["partition_key"] = f"thread_{payload.get('extraction_thread_id', 1)}"
             payload["attempt_index"] = int(payload.get("extraction_attempt", 1))
+            
+            # Dynamic Anomaly evaluation logic
+            duration = payload["session_duration_sec"]
+            payload["is_anomaly_detected"] = True if duration > 1500 or duration < 5 else False
+            
             transformed.append(payload)
         return transformed
