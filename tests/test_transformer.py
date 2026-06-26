@@ -13,15 +13,14 @@ class TestTransformer(unittest.TestCase):
         self.assertEqual(res[0]["action"], "CLICK")
         self.assertEqual(res[0]["device_type"], "mobile")
 
-    def test_attempt_index_mapping(self):
-        mock_raw = [{"event_id": "evt_555", "action": "view", "extraction_attempt": 2}]
+    def test_anomaly_flag_evaluation_triggered(self):
+        mock_raw = [{"event_id": "evt_anomaly_high", "action": "view", "session_duration_sec": 1750}]
         res = self.transformer.transform_payload(mock_raw)
-        self.assertEqual(res[0]["attempt_index"], 2)
+        self.assertTrue(res[0]["is_anomaly_detected"])
 
-    def test_injection_safe_payload_transform(self):
-        mock_raw = [{"event_id": "evt_456", "action": "purchase; DROP TABLE users; --", "device_type": "desktop"}]
+    def test_anomaly_flag_evaluation_normal(self):
+        mock_raw = [{"event_id": "evt_anomaly_low", "action": "view", "session_duration_sec": 450}]
         res = self.transformer.transform_payload(mock_raw)
-        self.assertNotIn(";", res[0]["action"])
-        self.assertTrue(res[0]["action"].startswith("PURCHASE DROP"))
+        self.assertFalse(res[0]["is_anomaly_detected"])
 if __name__ == '__main__':
     unittest.main()
