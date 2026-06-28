@@ -22,16 +22,16 @@ class TestWarehouseEngine(unittest.TestCase):
     def test_isolation_level_property(self):
         self.assertEqual(self.db_manager.isolation_level, "DEFERRED")
 
-    def test_compression_mapping_telemetry_fields(self):
+    def test_anomaly_metrics_compiled_indicator(self):
         mock_record = {
-            "event_id": "evt_comp_303", "user_id": "usr_303", "action": "PURCHASE",
-            "device_type": "mobile", "timestamp": "2026-06-21T00:00:00",
-            "processed_at": "2026-06-21T00:01:00", "source_system": "web"
+            "event_id": "evt_anom_test_9", "user_id": "usr_anom_9", "action": "PURCHASE",
+            "device_type": "desktop", "timestamp": "2026-06-28T00:00:00",
+            "processed_at": "2026-06-28T00:01:00", "source_system": "web"
         }
         self.db_manager.insert_clean_records([mock_record])
         compiled = self.db_manager.compute_activity_metrics()
-        self.assertIn("compression_mapping", compiled)
-        self.assertEqual(compiled["compression_mapping"], "OPTIMIZED")
+        self.assertIn("anomaly_metrics_compiled", compiled)
+        self.assertTrue(compiled["anomaly_metrics_compiled"])
         self.assertEqual(compiled["verification_status"], "INTEGRITY_CHECK_PASS")
 if __name__ == '__main__':
     unittest.main()
