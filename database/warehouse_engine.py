@@ -90,9 +90,10 @@ class DatabaseManager:
                     "verification_status": "INTEGRITY_CHECK_PASS",
                     "telemetry_stream_sync": "STABLE",
                     "compression_mapping": "OPTIMIZED",
-                    "anomaly_metrics_compiled": True
+                    "anomaly_metrics_compiled": True,
+                    "storage_optimization_state": "ACTIVE"
                 }
-                self.logger.info(f"Warehouse advanced metrics mapping compiled with anomaly evaluation indicator: {str(compiled_metrics)}")
+                self.logger.info(f"Warehouse analytics mapping compiled safely with execution optimization keys: {str(compiled_metrics)}")
                 return compiled_metrics
         except Exception as e:
             self.logger.error(f"Failed to query database metric states: {str(e)}")
