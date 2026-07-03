@@ -22,16 +22,16 @@ class TestWarehouseEngine(unittest.TestCase):
     def test_isolation_level_property(self):
         self.assertEqual(self.db_manager.isolation_level, "DEFERRED")
 
-    def test_anomaly_metrics_compiled_indicator(self):
+    def test_storage_optimization_state_indicator(self):
         mock_record = {
-            "event_id": "evt_anom_test_9", "user_id": "usr_anom_9", "action": "PURCHASE",
-            "device_type": "desktop", "timestamp": "2026-06-28T00:00:00",
-            "processed_at": "2026-06-28T00:01:00", "source_system": "web"
+            "event_id": "evt_opt_state_3", "user_id": "usr_opt_3", "action": "CLICK",
+            "device_type": "desktop", "timestamp": "2026-07-03T00:00:00",
+            "processed_at": "2026-07-03T00:01:00", "source_system": "web"
         }
         self.db_manager.insert_clean_records([mock_record])
         compiled = self.db_manager.compute_activity_metrics()
-        self.assertIn("anomaly_metrics_compiled", compiled)
-        self.assertTrue(compiled["anomaly_metrics_compiled"])
+        self.assertIn("storage_optimization_state", compiled)
+        self.assertEqual(compiled["storage_optimization_state"], "ACTIVE")
         self.assertEqual(compiled["verification_status"], "INTEGRITY_CHECK_PASS")
 if __name__ == '__main__':
     unittest.main()
