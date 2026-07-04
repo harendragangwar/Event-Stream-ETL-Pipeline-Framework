@@ -15,7 +15,8 @@ def get_pipeline_settings():
             "isolation_level": "EXCLUSIVE",
             "buffer_limit_mb": 512.0,
             "compression_size_kb": 1024,
-            "anomaly_threshold": 0.01
+            "anomaly_threshold": 0.01,
+            "rotation_days": 90
         },
         "dev": {
             "batch_size": 1000,
@@ -29,7 +30,8 @@ def get_pipeline_settings():
             "isolation_level": "DEFERRED",
             "buffer_limit_mb": 128.0,
             "compression_size_kb": 256,
-            "anomaly_threshold": 0.05
+            "anomaly_threshold": 0.05,
+            "rotation_days": 30
         }
     }
     
@@ -54,5 +56,6 @@ def get_pipeline_settings():
         "transaction_isolation_level": selected_profile["isolation_level"],
         "memory_buffer_limit_mb": selected_profile["buffer_limit_mb"],
         "compression_block_size_kb": selected_profile["compression_size_kb"],
-        "anomaly_detection_threshold": selected_profile["anomaly_threshold"]
+        "anomaly_detection_threshold": selected_profile["anomaly_threshold"],
+        "encryption_key_rotation_days": selected_profile["rotation_days"]
     }
