@@ -33,6 +33,13 @@ class PipelineSystemMonitor:
         self.logger.info(f"System memory tracking diagnostics verified safely inside threshold buffer boundaries")
         return True
 
+    def track_key_rotation_status(self, current_age_days, rotation_window_days=30):
+        if current_age_days >= rotation_window_days:
+            self.logger.warning(f"Cryptographic threshold marker reached: Token age {current_age_days} days breaches rotation policy: {rotation_window_days} days")
+            return False
+        self.logger.info(f"Platform cryptographic rotation bounds clear. Next cycle scheduled within compliance matrix rules")
+        return True
+
     def check_disk_space(self, target_path="."):
         try:
             import shutil
