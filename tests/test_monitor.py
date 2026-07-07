@@ -16,12 +16,12 @@ class TestSystemMonitor(unittest.TestCase):
         self.assertIsInstance(free_gb, float)
         self.assertTrue(free_gb >= 0.0)
 
-    def test_enforce_buffer_limits_valid(self):
-        res = self.monitor.enforce_buffer_limits_check(50.0, max_limit_mb=128.0)
+    def test_key_rotation_status_compliant(self):
+        res = self.monitor.track_key_rotation_status(15, rotation_window_days=30)
         self.assertTrue(res)
 
-    def test_enforce_buffer_limits_breached(self):
-        res = self.monitor.enforce_buffer_limits_check(200.0, max_limit_mb=128.0)
+    def test_key_rotation_status_breached(self):
+        res = self.monitor.track_key_rotation_status(35, rotation_window_days=30)
         self.assertFalse(res)
 if __name__ == '__main__':
     unittest.main()
