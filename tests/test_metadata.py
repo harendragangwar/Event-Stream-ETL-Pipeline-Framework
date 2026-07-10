@@ -16,15 +16,15 @@ class TestMetadata(unittest.TestCase):
             except: pass
 
     def test_compliance_matrix_generation_v26(self):
-        res = self.tracker.generate_run_summary("run_20260701", 100, 95, meta_dir=self.test_meta_dir)
+        res = self.tracker.generate_run_summary("run_20260710", 100, 95, meta_dir=self.test_meta_dir)
         self.assertTrue(res["compliance_checks"]["anonymization_applied"])
         self.assertEqual(res["compliance_checks"]["schema_version"], "v2.6")
-        self.assertEqual(res["environment_telemetry"]["engine_version"], "1.8.2")
+        self.assertEqual(res["environment_telemetry"]["engine_version"], "1.8.6")
 
-    def test_anomaly_profiling_metadata_indicator(self):
-        res = self.tracker.generate_run_summary("run_anomaly_meta_assert", 90, 85, meta_dir=self.test_meta_dir)
+    def test_key_rotation_check_telemetry_indicator(self):
+        res = self.tracker.generate_run_summary("run_rotation_meta_assert", 70, 68, meta_dir=self.test_meta_dir)
         self.assertIn("resource_profiling", res)
+        self.assertTrue(res["resource_profiling"]["key_rotation_check_applied"])
         self.assertTrue(res["resource_profiling"]["anomaly_profiling_enabled"])
-        self.assertTrue(res["resource_profiling"]["compression_window_active"])
 if __name__ == '__main__':
     unittest.main()
