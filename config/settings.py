@@ -16,7 +16,8 @@ def get_pipeline_settings():
             "buffer_limit_mb": 512.0,
             "compression_size_kb": 1024,
             "anomaly_threshold": 0.01,
-            "rotation_days": 90
+            "rotation_days": 90,
+            "io_streams": 8
         },
         "dev": {
             "batch_size": 1000,
@@ -31,7 +32,8 @@ def get_pipeline_settings():
             "buffer_limit_mb": 128.0,
             "compression_size_kb": 256,
             "anomaly_threshold": 0.05,
-            "rotation_days": 30
+            "rotation_days": 30,
+            "io_streams": 2
         }
     }
     
@@ -57,5 +59,6 @@ def get_pipeline_settings():
         "memory_buffer_limit_mb": selected_profile["buffer_limit_mb"],
         "compression_block_size_kb": selected_profile["compression_size_kb"],
         "anomaly_detection_threshold": selected_profile["anomaly_threshold"],
-        "encryption_key_rotation_days": selected_profile["rotation_days"]
+        "encryption_key_rotation_days": selected_profile["rotation_days"],
+        "max_parallel_io_streams": selected_profile["io_streams"]
     }
