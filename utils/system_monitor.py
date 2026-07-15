@@ -40,6 +40,13 @@ class PipelineSystemMonitor:
         self.logger.info(f"Platform cryptographic rotation bounds clear. Next cycle scheduled within compliance matrix rules")
         return True
 
+    def verify_active_io_streams(self, active_count, max_allowed_streams=2):
+        if active_count > max_allowed_streams:
+            self.logger.critical(f"I/O stream threshold exceeded: Active {active_count} concurrent streams breach configuration limit: {max_allowed_streams}")
+            return False
+        self.logger.info(f"Concurrent workflow streams verified inside pipeline safety boundaries: {active_count}/{max_allowed_streams}")
+        return True
+
     def check_disk_space(self, target_path="."):
         try:
             import shutil
