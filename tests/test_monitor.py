@@ -16,12 +16,12 @@ class TestSystemMonitor(unittest.TestCase):
         self.assertIsInstance(free_gb, float)
         self.assertTrue(free_gb >= 0.0)
 
-    def test_staging_retention_window_compliant(self):
-        res = self.monitor.verify_staging_retention_window(12, max_allowed_hours=24)
+    def test_active_io_streams_compliant(self):
+        res = self.monitor.verify_active_io_streams(2, max_allowed_streams=4)
         self.assertTrue(res)
 
-    def test_staging_retention_window_breached(self):
-        res = self.monitor.verify_staging_retention_window(36, max_allowed_hours=24)
+    def test_active_io_streams_exceeded(self):
+        res = self.monitor.verify_active_io_streams(5, max_allowed_streams=4)
         self.assertFalse(res)
 if __name__ == '__main__':
     unittest.main()
