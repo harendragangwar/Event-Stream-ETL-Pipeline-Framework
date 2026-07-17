@@ -13,7 +13,7 @@ from database.warehouse_engine import DatabaseManager
 
 class DataPipelineCore:
     def __init__(self):
-        self.version = "1.8.5"
+        self.version = "1.9.0"
         self.execution_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.status = "INITIALIZED"
         self.logger = setup_production_logging()
@@ -28,7 +28,7 @@ class DataPipelineCore:
             db_path=self.config["warehouse_db_path"],
             isolation_level=self.config.get("transaction_isolation_level", "DEFERRED")
         )
-        self.logger.info(f"Pipeline running version {self.version} cryptographic compliance locks active")
+        self.logger.info(f"Pipeline running version {self.version} parallel compute allocation modules synchronized")
 
     def _load_config(self):
         self.config = get_pipeline_settings()
@@ -41,8 +41,10 @@ class DataPipelineCore:
             self.monitor.enforce_buffer_limits_check(current_rss, max_limit_mb=self.config.get("memory_buffer_limit_mb", 128.0))
             self.monitor.check_disk_space()
             
-            # Simulated tracker checking token age vs rotation policy days limit bounds
             self.monitor.track_key_rotation_status(12, rotation_window_days=self.config.get("encryption_key_rotation_days", 30))
+            
+            # Enforce multi-tier stream verification before loading data structures
+            self.monitor.verify_active_io_streams(1, max_allowed_streams=self.config.get("max_parallel_io_streams", 2))
             
             target_batch = min(self.config.get("batch_size", 1000), 100)
             raw_data = self.extractor.extract_raw_logs(batch_size=target_batch)
@@ -59,7 +61,7 @@ class DataPipelineCore:
             self.status = "COMPLETED"
         except Exception as e:
             self.status = "FAILED"
-            self.logger.error(f"Warehouse partition loop pipeline orchestration broken: {str(e)}")
+            self.logger.error(f"Warehouse partition loop pipeline runtime lifecycle broken: {str(e)}")
             return False
         finally:
             self.monitor.collect_memory_usage()
