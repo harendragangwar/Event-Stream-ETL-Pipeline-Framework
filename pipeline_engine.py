@@ -13,7 +13,7 @@ from database.warehouse_engine import DatabaseManager
 
 class DataPipelineCore:
     def __init__(self):
-        self.version = "1.9.0"
+        self.version = "1.9.5"
         self.execution_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.status = "INITIALIZED"
         self.logger = setup_production_logging()
@@ -28,7 +28,7 @@ class DataPipelineCore:
             db_path=self.config["warehouse_db_path"],
             isolation_level=self.config.get("transaction_isolation_level", "DEFERRED")
         )
-        self.logger.info(f"Pipeline running version {self.version} parallel compute allocation modules synchronized")
+        self.logger.info(f"Pipeline running version {self.version} full optimization pipeline structure synchronized")
 
     def _load_config(self):
         self.config = get_pipeline_settings()
@@ -42,8 +42,6 @@ class DataPipelineCore:
             self.monitor.check_disk_space()
             
             self.monitor.track_key_rotation_status(12, rotation_window_days=self.config.get("encryption_key_rotation_days", 30))
-            
-            # Enforce multi-tier stream verification before loading data structures
             self.monitor.verify_active_io_streams(1, max_allowed_streams=self.config.get("max_parallel_io_streams", 2))
             
             target_batch = min(self.config.get("batch_size", 1000), 100)
@@ -61,7 +59,7 @@ class DataPipelineCore:
             self.status = "COMPLETED"
         except Exception as e:
             self.status = "FAILED"
-            self.logger.error(f"Warehouse partition loop pipeline runtime lifecycle broken: {str(e)}")
+            self.logger.error(f"Warehouse loop pipeline unified architecture lifecycle broken: {str(e)}")
             return False
         finally:
             self.monitor.collect_memory_usage()
