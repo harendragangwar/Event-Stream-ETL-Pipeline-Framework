@@ -47,6 +47,13 @@ class PipelineSystemMonitor:
         self.logger.info(f"Concurrent workflow streams verified inside pipeline safety boundaries: {active_count}/{max_allowed_streams}")
         return True
 
+    def verify_heartbeat_telemetry(self, last_seen_sec, max_interval_sec=5):
+        if last_seen_sec > max_interval_sec:
+            self.logger.warning(f"Heartbeat interval breached threshold mismatch: {last_seen_sec}s exceeded policy limit: {max_interval_sec}s")
+            return False
+        self.logger.info(f"Network telemetry heartbeat sync verified online. Connection state is functional")
+        return True
+
     def check_disk_space(self, target_path="."):
         try:
             import shutil
