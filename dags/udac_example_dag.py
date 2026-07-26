@@ -10,7 +10,6 @@ from airflow.operators.subdag_operator import SubDagOperator
 
 #os.environ.get('AWS_KEY')
 #os.environ.get('AWS_SECRET')
-
 s3_bucket = 'udacity-dend-warehouse'
 song_s3_key = "song_data"
 log_s3_key = "log-data"
