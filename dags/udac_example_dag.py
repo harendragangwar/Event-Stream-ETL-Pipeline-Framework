@@ -40,7 +40,6 @@ create_tables_in_redshift = CreateTableOperator(
     redshift_conn_id = 'redshift',
     dag = dag
 )
-
 stage_events_to_redshift = StageToRedshiftOperator(
     task_id='Stage_events',
     table_name="staging_events",
