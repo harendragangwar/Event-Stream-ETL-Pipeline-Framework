@@ -16,12 +16,12 @@ class TestSystemMonitor(unittest.TestCase):
         self.assertIsInstance(free_gb, float)
         self.assertTrue(free_gb >= 0.0)
 
-    def test_key_rotation_status_compliant(self):
-        res = self.monitor.track_key_rotation_status(15, rotation_window_days=30)
+    def test_heartbeat_telemetry_compliant(self):
+        res = self.monitor.verify_heartbeat_telemetry(3, max_interval_sec=5)
         self.assertTrue(res)
 
-    def test_key_rotation_status_breached(self):
-        res = self.monitor.track_key_rotation_status(35, rotation_window_days=30)
+    def test_heartbeat_telemetry_breached(self):
+        res = self.monitor.verify_heartbeat_telemetry(8, max_interval_sec=5)
         self.assertFalse(res)
 if __name__ == '__main__':
     unittest.main()
