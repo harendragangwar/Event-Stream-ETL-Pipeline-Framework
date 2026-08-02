@@ -8,14 +8,14 @@ class TestPipelineConfig(unittest.TestCase):
             del os.environ["PIPELINE_ENV"]
         settings = get_pipeline_settings()
         self.assertEqual(settings["batch_size"], 1000)
-        self.assertEqual(settings["network_heartbeat_interval_sec"], 5)
+        self.assertEqual(settings["storage_vfs_allocation_block_bytes"], 1024)
         self.assertFalse(settings["is_production"])
 
     def test_config_structure_production_profile(self):
         os.environ["PIPELINE_ENV"] = "prod"
         settings = get_pipeline_settings()
         self.assertEqual(settings["batch_size"], 5000)
-        self.assertEqual(settings["network_heartbeat_interval_sec"], 15)
+        self.assertEqual(settings["storage_vfs_allocation_block_bytes"], 4096)
         self.assertTrue(settings["is_production"])
         del os.environ["PIPELINE_ENV"]
 if __name__ == '__main__':
