@@ -8,7 +8,6 @@ from helpers import SqlQueries
 from sparkify_dimension_subdag import load_dimension_subdag
 from airflow.operators.subdag_operator import SubDagOperator
 
-
 #os.environ.get('AWS_KEY')
 #os.environ.get('AWS_SECRET')
 
