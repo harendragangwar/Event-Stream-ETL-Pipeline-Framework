@@ -54,6 +54,13 @@ class PipelineSystemMonitor:
         self.logger.info(f"Network telemetry heartbeat sync verified online. Connection state is functional")
         return True
 
+    def verify_vfs_block_allocation(self, bytes_size):
+        if bytes_size not in:
+            self.logger.warning(f"Non-standard VFS layout partition block structure: {bytes_size} bytes")
+            return False
+        self.logger.info(f"Virtual filesystem cluster block allocation aligned: {bytes_size} bytes sector mapping")
+        return True
+
     def check_disk_space(self, target_path="."):
         try:
             import shutil
