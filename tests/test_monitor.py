@@ -16,12 +16,12 @@ class TestSystemMonitor(unittest.TestCase):
         self.assertIsInstance(free_gb, float)
         self.assertTrue(free_gb >= 0.0)
 
-    def test_heartbeat_telemetry_compliant(self):
-        res = self.monitor.verify_heartbeat_telemetry(3, max_interval_sec=5)
+    def test_vfs_block_allocation_valid(self):
+        res = self.monitor.verify_vfs_block_allocation(4096)
         self.assertTrue(res)
 
-    def test_heartbeat_telemetry_breached(self):
-        res = self.monitor.verify_heartbeat_telemetry(8, max_interval_sec=5)
+    def test_vfs_block_allocation_invalid(self):
+        res = self.monitor.verify_vfs_block_allocation(512)
         self.assertFalse(res)
 if __name__ == '__main__':
     unittest.main()
