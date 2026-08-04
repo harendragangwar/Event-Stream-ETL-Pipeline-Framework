@@ -19,7 +19,6 @@ class CreateTableOperator(BaseOperator):
         self.log.info('Executing creating tables in Redshift.')
         queries =  open('/home/workspace/airflow/create_tables.sql', 'r').read()
         redshift.run(queries)
-        
         self.log.info("Tables created ")
         
 
