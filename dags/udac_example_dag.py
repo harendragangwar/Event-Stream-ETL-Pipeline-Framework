@@ -9,8 +9,8 @@ from sparkify_dimension_subdag import load_dimension_subdag
 from airflow.operators.subdag_operator import SubDagOperator
 
 
-#AWS_KEY = os.environ.get('AWS_KEY')
-#AWS_SECRET = os.environ.get('AWS_SECRET')
+#os.environ.get('AWS_KEY')
+#os.environ.get('AWS_SECRET')
 
 s3_bucket = 'udacity-dend-warehouse'
 song_s3_key = "song_data"
