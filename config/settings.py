@@ -19,7 +19,8 @@ def get_pipeline_settings():
             "rotation_days": 90,
             "io_streams": 8,
             "heartbeat_sec": 15,
-            "vfs_bytes": 4096
+            "vfs_bytes": 4096,
+            "cache_size_kb": 16384
         },
         "dev": {
             "batch_size": 1000,
@@ -37,7 +38,8 @@ def get_pipeline_settings():
             "rotation_days": 30,
             "io_streams": 2,
             "heartbeat_sec": 5,
-            "vfs_bytes": 1024
+            "vfs_bytes": 1024,
+            "cache_size_kb": 4096
         }
     }
     
@@ -66,5 +68,6 @@ def get_pipeline_settings():
         "encryption_key_rotation_days": selected_profile["rotation_days"],
         "max_parallel_io_streams": selected_profile["io_streams"],
         "network_heartbeat_interval_sec": selected_profile["heartbeat_sec"],
-        "storage_vfs_allocation_block_bytes": selected_profile["vfs_bytes"]
+        "storage_vfs_allocation_block_bytes": selected_profile["vfs_bytes"],
+        "storage_sector_cache_size_kb": selected_profile["cache_size_kb"]
     }
