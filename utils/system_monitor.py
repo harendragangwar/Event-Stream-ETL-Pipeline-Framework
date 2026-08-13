@@ -61,6 +61,13 @@ class PipelineSystemMonitor:
         self.logger.info(f"Virtual filesystem cluster block allocation aligned: {bytes_size} bytes sector mapping")
         return True
 
+    def verify_sector_cache_limit(self, cache_size_kb, max_allowed_kb=4096):
+        if cache_size_kb > max_allowed_kb:
+            self.logger.warning(f"Cache threshold exceeded: Active sector pooling buffer size {cache_size_kb} KB breaches pool configuration: {max_allowed_kb} KB")
+            return False
+        self.logger.info(f"Storage cache capacity window verified inside secure heap criteria: {cache_size_kb}/{max_allowed_kb} KB")
+        return True
+
     def check_disk_space(self, target_path="."):
         try:
             import shutil
