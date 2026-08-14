@@ -16,12 +16,12 @@ class TestSystemMonitor(unittest.TestCase):
         self.assertIsInstance(free_gb, float)
         self.assertTrue(free_gb >= 0.0)
 
-    def test_vfs_block_allocation_valid(self):
-        res = self.monitor.verify_vfs_block_allocation(4096)
+    def test_sector_cache_limit_compliant(self):
+        res = self.monitor.verify_sector_cache_limit(2048, max_allowed_kb=4096)
         self.assertTrue(res)
 
-    def test_vfs_block_allocation_invalid(self):
-        res = self.monitor.verify_vfs_block_allocation(512)
+    def test_sector_cache_limit_breached(self):
+        res = self.monitor.verify_sector_cache_limit(8192, max_allowed_kb=4096)
         self.assertFalse(res)
 if __name__ == '__main__':
     unittest.main()
