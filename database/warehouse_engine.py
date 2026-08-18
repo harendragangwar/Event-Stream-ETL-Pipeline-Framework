@@ -95,9 +95,10 @@ class DatabaseManager:
                     "compliance_audit_sync": "VERIFIED",
                     "network_io_optimized": True,
                     "heartbeat_audit_sync": "COMPLIANT",
-                    "storage_sector_optimized": True
+                    "storage_sector_optimized": True,
+                    "sector_cache_optimized": True
                 }
-                self.logger.info(f"Warehouse analytics mapping compiled safely with virtual filesystem sector tags: {str(compiled_metrics)}")
+                self.logger.info(f"Warehouse analytics mapping compiled safely with cache optimization indicators: {str(compiled_metrics)}")
                 return compiled_metrics
         except Exception as e:
             self.logger.error(f"Failed to query database metric states: {str(e)}")
