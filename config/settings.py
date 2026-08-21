@@ -20,7 +20,8 @@ def get_pipeline_settings():
             "io_streams": 8,
             "heartbeat_sec": 15,
             "vfs_bytes": 4096,
-            "cache_size_kb": 16384
+            "cache_size_kb": 16384,
+            "retention_hours": 72
         },
         "dev": {
             "batch_size": 1000,
@@ -39,7 +40,8 @@ def get_pipeline_settings():
             "io_streams": 2,
             "heartbeat_sec": 5,
             "vfs_bytes": 1024,
-            "cache_size_kb": 4096
+            "cache_size_kb": 4096,
+            "retention_hours": 24
         }
     }
     
@@ -69,5 +71,6 @@ def get_pipeline_settings():
         "max_parallel_io_streams": selected_profile["io_streams"],
         "network_heartbeat_interval_sec": selected_profile["heartbeat_sec"],
         "storage_vfs_allocation_block_bytes": selected_profile["vfs_bytes"],
-        "storage_sector_cache_size_kb": selected_profile["cache_size_kb"]
+        "storage_sector_cache_size_kb": selected_profile["cache_size_kb"],
+        "max_staging_directory_retention_hours": selected_profile["retention_hours"]
     }
