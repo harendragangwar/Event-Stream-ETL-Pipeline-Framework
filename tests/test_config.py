@@ -8,14 +8,14 @@ class TestPipelineConfig(unittest.TestCase):
             del os.environ["PIPELINE_ENV"]
         settings = get_pipeline_settings()
         self.assertEqual(settings["batch_size"], 1000)
-        self.assertEqual(settings["storage_sector_cache_size_kb"], 4096)
+        self.assertEqual(settings["max_staging_directory_retention_hours"], 24)
         self.assertFalse(settings["is_production"])
 
     def test_config_structure_production_profile(self):
         os.environ["PIPELINE_ENV"] = "prod"
         settings = get_pipeline_settings()
         self.assertEqual(settings["batch_size"], 5000)
-        self.assertEqual(settings["storage_sector_cache_size_kb"], 16384)
+        self.assertEqual(settings["max_staging_directory_retention_hours"], 72)
         self.assertTrue(settings["is_production"])
         del os.environ["PIPELINE_ENV"]
 if __name__ == '__main__':
