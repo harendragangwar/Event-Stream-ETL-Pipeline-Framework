@@ -68,6 +68,13 @@ class PipelineSystemMonitor:
         self.logger.info(f"Storage cache capacity window verified inside secure heap criteria: {cache_size_kb}/{max_allowed_kb} KB")
         return True
 
+    def verify_staging_retention_window(self, current_hours, max_allowed_hours=24):
+        if current_hours > max_allowed_hours:
+            self.logger.warning(f"Staging threshold warning: Transient tracking volume age {current_hours} hours breaches policy window: {max_allowed_hours} hours")
+            return False
+        self.logger.info(f"Staging cluster retention compliance checked safely within boundaries: {current_hours}/{max_allowed_hours} hours")
+        return True
+
     def check_disk_space(self, target_path="."):
         try:
             import shutil
