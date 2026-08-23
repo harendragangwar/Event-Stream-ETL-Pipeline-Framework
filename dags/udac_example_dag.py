@@ -15,7 +15,6 @@ s3_bucket = 'udacity-dend-warehouse'
 song_s3_key = "song_data"
 log_s3_key = "log-data"
 log_json_file = "log_json_path.json"
-
 default_args = {
     'owner': 'udacity',
     'depends_on_past': True,
