@@ -16,12 +16,12 @@ class TestSystemMonitor(unittest.TestCase):
         self.assertIsInstance(free_gb, float)
         self.assertTrue(free_gb >= 0.0)
 
-    def test_sector_cache_limit_compliant(self):
-        res = self.monitor.verify_sector_cache_limit(2048, max_allowed_kb=4096)
+    def test_staging_retention_window_compliant(self):
+        res = self.monitor.verify_staging_retention_window(12, max_allowed_hours=24)
         self.assertTrue(res)
 
-    def test_sector_cache_limit_breached(self):
-        res = self.monitor.verify_sector_cache_limit(8192, max_allowed_kb=4096)
+    def test_staging_retention_window_breached(self):
+        res = self.monitor.verify_staging_retention_window(36, max_allowed_hours=24)
         self.assertFalse(res)
 if __name__ == '__main__':
     unittest.main()
