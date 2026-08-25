@@ -13,7 +13,7 @@ from database.warehouse_engine import DatabaseManager
 
 class DataPipelineCore:
     def __init__(self):
-        self.version = "2.2.5"
+        self.version = "2.3.0"
         self.execution_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.status = "INITIALIZED"
         self.logger = setup_production_logging()
@@ -28,7 +28,7 @@ class DataPipelineCore:
             db_path=self.config["warehouse_db_path"],
             isolation_level=self.config.get("transaction_isolation_level", "DEFERRED")
         )
-        self.logger.info(f"Pipeline running version {self.version} analytical caching metrics core engine fully synchronized")
+        self.logger.info(f"Pipeline running version {self.version} staging volume transient retention boundaries active")
 
     def _load_config(self):
         self.config = get_pipeline_settings()
@@ -47,6 +47,9 @@ class DataPipelineCore:
             self.monitor.verify_vfs_block_allocation(self.config.get("storage_vfs_allocation_block_bytes", 1024))
             self.monitor.verify_sector_cache_limit(2048, max_allowed_kb=self.config.get("storage_sector_cache_size_kb", 4096))
             
+            # Enforce staging directory file retention windows limits before execution
+            self.monitor.verify_staging_retention_window(10, max_allowed_hours=self.config.get("max_staging_directory_retention_hours", 24))
+            
             target_batch = min(self.config.get("batch_size", 1000), 100)
             raw_data = self.extractor.extract_raw_logs(batch_size=target_batch)
             if len(raw_data) < 1:
@@ -62,7 +65,7 @@ class DataPipelineCore:
             self.status = "COMPLETED"
         except Exception as e:
             self.status = "FAILED"
-            self.logger.error(f"Warehouse loop orchestration sequence crash tracking error: {str(e)}")
+            self.logger.error(f"Warehouse loop orchestration sequence transient tracking failure: {str(e)}")
             return False
         finally:
             self.monitor.collect_memory_usage()
