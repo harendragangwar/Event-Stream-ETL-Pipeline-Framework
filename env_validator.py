@@ -8,7 +8,7 @@ def verify_required_env_vars():
     if missing_vars:
         print(f"Warning: Missing required environment variables: {missing_vars}")
         return False
-    print("All required environment configurations are verified")
+    print("required environment configurations are verified")
     return True
 
 if __name__ == "__main__":
